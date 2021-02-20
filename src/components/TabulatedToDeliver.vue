@@ -27,7 +27,7 @@
                     <div>
                       <download-csv
                         class="btn btn-default pa-2"
-                        :data="todelivered"
+                        :data="csvToBeDelivered"
                         name="Deliveries.csv"
                       >Export as CSV</download-csv>
                     </div>
@@ -139,6 +139,7 @@ export default {
   data() {
     return {
       todelivered: [],
+      csvToBeDelivered: [],
       is_empty: false,
       headers: [
         {
@@ -190,12 +191,37 @@ export default {
   },
   created() {
     this.getToDelivered();
+    this.csvToDeliver();
   },
   methods: {
     getColor(status) {
       if (status === "Canceled") return "orange";
       else if (status === "On order") return "blue";
       else return "green";
+    },
+    csvToDeliver() {
+      axios
+        .get(this.url + "/api/posts/delivery", this.config)
+        .then(response => {
+          this.csvToBeDelivered = response.data.data;
+
+          this.csvToBeDelivered.forEach((order, index) => {
+            let {
+              // building_or_street,
+              // barangay,
+              // city_or_municipality,
+              // province,
+              ubehalayajar_qty,
+              ubehalayatub_qty
+            } = order;
+            var place = building_or_street
+              .toString()
+              .concat(" ", barangay, " ", city_or_municipality, " ", province);
+            this.csvToBeDelivered[index]["customer_address"] = place;
+            this.csvToBeDelivered[index]["total_item"] =
+              ubehalayatub_qty + ubehalayajar_qty;
+          });
+        });
     },
     getToDelivered() {
       axios
