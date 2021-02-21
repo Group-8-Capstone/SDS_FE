@@ -1,15 +1,15 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Order from "../views/Order.vue";
-import Stock from "../views/Stock.vue";
+// import Stock from "../views/Stock.vue";
 import Delivery from "../views/OrderToDeliver.vue";
 import Login from "../views/Login.vue"
 import Delivered from "../views/Delivered.vue";
-import Home from "../views/Home.vue";
-import Setting from "../views/Setting.vue";
-import Ingredients from "../views/IngredientsStock.vue";
-import Product from "../views/ProductsStock.vue";
-import AccountSetting from "../components/ProfileAccount.vue";
+// import Home from "../views/Home.vue";
+// import Setting from "../views/Setting.vue";
+// import Ingredients from "../views/IngredientsStock.vue";
+// import Product from "../views/ProductsStock.vue";
+// import AccountSetting from "../components/ProfileAccount.vue";
 // import Register from "../views/RegisterComponent.vue";
 import Logs from "../views/Logs.vue";
 // import CustomerHome from "../views/CustomerHome.vue";
@@ -30,12 +30,12 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
-    // {
-    //   path: "/",
-    //   name: "Landing",
-    //   component: Landing,
-    //   role: ['admin','customer','driver']
-    // },
+    {
+      path: "/",
+      name: "LoginDefault",
+      component: Login,
+      role: ['admin','customer','driver']
+    },
     // {
     //   path: "/",
     //   name: "Landing",
@@ -68,15 +68,15 @@ const router = new VueRouter({
         role: ['admin']
       },
     },
-    {
-      path: "/stock",
-      name: "Stock",
-      component: Stock,
-      meta: {
-        requiresAuth: true,
-        role: ['admin']
-      },
-    },
+    // {
+    //   path: "/stock",
+    //   name: "Stock",
+    //   component: Stock,
+    //   meta: {
+    //     requiresAuth: true,
+    //     role: ['admin']
+    //   },
+    // },
     {
       path: "/delivered",
       name: "Delivered",
@@ -113,15 +113,15 @@ const router = new VueRouter({
         role: ['admin','driver']
       },
     },
-    {
-      path: "/product",
-      name: "Product",
-      component: Product,
-      meta: {
-        requiresAuth: true,
-        role: ['admin']
-      },
-    },
+    // {
+    //   path: "/product",
+    //   name: "Product",
+    //   component: Product,
+    //   meta: {
+    //     requiresAuth: true,
+    //     role: ['admin']
+    //   },
+    // },
     {
       path: "/logs",
       name: "Logs",
@@ -131,42 +131,42 @@ const router = new VueRouter({
         role: ['admin','rider']
       },
     },
-    {
-      path: "/dashboard",
-      name: "dashboard",
-      component: Home,
-      meta: {
-        requiresAuth: true,
-        role: ['admin']
-      },
-    },
-    {
-      path: "/setting",
-      name: "BusinessSetting",
-      component: Setting,
-      meta: {
-        requiresAuth: true,
-        role: ['admin']
-      },
-    },
-    {
-      path: "/profileSetting",
-      name: "ProfileSetting",
-      component: AccountSetting,
-      meta: {
-        requiresAuth: true,
-        role: ['admin', 'driver', 'customer']
-      },
-    },
-    {
-      path: "/ingredients",
-      name: "Ingredients",
-      component: Ingredients,
-      meta: {
-        requiresAuth: true,
-        role: ['admin']
-      },
-    },
+    // {
+    //   path: "/dashboard",
+    //   name: "dashboard",
+    //   component: Home,
+    //   meta: {
+    //     requiresAuth: true,
+    //     role: ['admin']
+    //   },
+    // },
+    // {
+    //   path: "/setting",
+    //   name: "BusinessSetting",
+    //   component: Setting,
+    //   meta: {
+    //     requiresAuth: true,
+    //     role: ['admin']
+    //   },
+    // },
+    // {
+    //   path: "/profileSetting",
+    //   name: "ProfileSetting",
+    //   component: AccountSetting,
+    //   meta: {
+    //     requiresAuth: true,
+    //     role: ['admin', 'driver', 'customer']
+    //   },
+    // },
+    // {
+    //   path: "/ingredients",
+    //   name: "Ingredients",
+    //   component: Ingredients,
+    //   meta: {
+    //     requiresAuth: true,
+    //     role: ['admin']
+    //   },
+    // },
     {
       path: "/about",
       name: "About",
@@ -195,7 +195,7 @@ const router = new VueRouter({
 
 router.beforeEach(async(to, from, next) => {
   const home = {
-    admin: '/dashboard',
+    admin: '/delivery',
     driver: '/delivery',
     // customer: '/customerHome'
   }

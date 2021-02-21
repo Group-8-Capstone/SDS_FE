@@ -6,10 +6,15 @@
           <!-- <v-spacer></v-spacer> -->
           <v-col class="float-left" cols="2">
             <div>
-              <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                  <div>
-                    <v-btn
+              <!-- <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }"> -->
+                  <!-- <div> -->
+                    <download-csv
+                        class="btn pa-2 float-right outlined"
+                        :data="csvToBeDelivered"
+                        name="Deliveries.csv"
+                      >Export as CSV</download-csv>
+                    <!-- <v-btn
                       @click="isEmpty(todelivered)"
                       class="float-left"
                       outlined
@@ -18,10 +23,10 @@
                       v-on="on"
                     >
                       <v-icon>mdi-download</v-icon>Export
-                    </v-btn>
-                  </div>
-                </template>
-                <v-list v-show="is_empty === false">
+                    </v-btn> -->
+                  <!-- </div> -->
+                <!-- </template> -->
+                <!-- <v-list v-show="is_empty === false">
                   <v-col>
                     <OrderToDeliverPdf :headers="headers" :records="todelivered"></OrderToDeliverPdf>
                     <div>
@@ -32,8 +37,8 @@
                       >Export as CSV</download-csv>
                     </div>
                   </v-col>
-                </v-list>
-              </v-menu>
+                </v-list> -->
+              <!-- </v-menu> -->
             </div>
           </v-col>
         </v-row>

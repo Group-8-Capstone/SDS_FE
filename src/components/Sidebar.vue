@@ -12,7 +12,7 @@
       <!-- <v-app-bar-items name="theitem" class="hidden-sm-and-down" app> -->
          <template v-if="isAdmin() === true">
         <div>
-          <v-menu offset-y>
+          <!-- <v-menu offset-y>
             <template v-slot:activator="{ on, attrs }">
               <v-btn v-bind="attrs" v-on="on" icon>
                 <v-icon medium color="black" right>mdi-bell-ring</v-icon>
@@ -47,13 +47,13 @@
                 <v-list-item-title style="font-size:12px">- - - - No Order - - - -</v-list-item-title>
               </v-list-item>
             </v-list>
-          </v-menu>
+          </v-menu> -->
         </div>
          </template>
 
             <template v-if="isCustomer() === true">
         <div>
-          <v-menu offset-y>
+          <!-- <v-menu offset-y>
             <template v-slot:activator="{ on, attrs }">
               <v-btn v-bind="attrs" v-on="on" icon>
                 <v-icon medium color="black" right>mdi-bell-ring</v-icon>
@@ -85,7 +85,7 @@
                 <v-list-item-title style="font-size:12px">- - - - No Order - - - -</v-list-item-title>
               </v-list-item>
             </v-list>
-          </v-menu>
+          </v-menu> -->
         </div>
          </template>
       <!-- </v-app-bar-items> -->
@@ -262,45 +262,16 @@ export default {
     count: 0,
     sound:'http://soundbible.com/mp3/Elevator Ding-SoundBible.com-685385892.mp3',
     admin: [
-      { icon: "mdi-view-dashboard", text: "Dashboard", link: "/dashboard" },
+      { icon: "mdi mdi-cart-plus", text: "Order", link: "/order" },
       {
-        icon: "mdi-history",
-        text: "Stock",
-        subItem: [
-          { icon: "mdi-cogs", title: "Stock Settings", link: "/setting" },
-          { icon: "mdi-stocking", title: "Ingredients", link: "/ingredients" },
-          {
-            icon: "mdi-package-variant",
-            title: "Products",
-            link: "/product"
-          },
-        ]
-      },
-      {
-        icon: "mdi-clipboard-outline",
-        text: "View Orders",
-        subItem: [
-          { icon: "mdi mdi-cart-plus", title: "Order", link: "/order" },
-          {
             icon: "mdi-clipboard-outline",
-            title: "To Deliver",
+            text: "To Deliver",
             link: "/delivery"
-          },
-          {
-            icon: "mdi-content-copy",
-            title: "Delivered Orders",
-            link: "/delivered"
-          }
-        ]
-        
-        
       },
-
-     
       {
-        icon: "mdi-account-settings",
-        text: "Profile Setting",
-        link: "/profileSetting"
+        icon: "mdi-content-copy",
+        text: "Delivered Orders",
+        link: "/delivered"
       },
       { icon: "mdi-logout", text: "Sign out", link: "/login" },
     ],
