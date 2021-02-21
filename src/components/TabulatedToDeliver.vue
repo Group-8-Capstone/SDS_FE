@@ -42,7 +42,78 @@
 
     <v-card flat>
       <br>
-      <v-data-table
+      <v-data-table :headers="headers" :items="todelivered">
+              <template v-slot:item.line_items="{ item }">
+                <div class="text-center">
+                  <v-dialog v-model="dialog" width="500">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
+                    </template>
+
+                    <v-card>
+                      <v-simple-table v-for="i in item.line_items" :key="i.product_name">
+                        <template v-slot:default>
+                          <thead>
+                            <tr>
+                              <th class="text-left">{{i.product_name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>{{ item.order_quantity }}</td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+                      <v-divider></v-divider>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </div>
+              </template>
+
+              <template v-slot:item.contact_number="{ item }">
+                <span>{{item.contact_number}}</span>
+              </template>
+              <template v-slot:item.distance="{ item }">
+                <span>{{item.distance+' km'}}</span>
+              </template>
+              <template v-slot:item.order_status="{ item }">
+                <v-chip :color="getColor(item.order_status)" dark>{{ item.order_status }}</v-chip>
+              </template>
+              <template v-slot:item.action="{ item }">
+                <div v-if="isCanceled(item) === true">
+                  <v-icon
+                    disabled
+                    @click="editDialog = !editDialog, editItem(item) "
+                    class="mr-2"
+                    normal
+                    title="Edit"
+                  >mdi-table-edit</v-icon>
+                  <v-icon
+                    disabled
+                    @click="alertCancel(item)"
+                    normal
+                    class="mr-2"
+                    title="Cancel"
+                  >mdi-cancel</v-icon>
+                </div>
+                <div v-else>
+                  <v-icon
+                    @click="editDialog = !editDialog, editItem(item) "
+                    class="mr-2"
+                    normal
+                    title="Edit"
+                  >mdi-table-edit</v-icon>
+                  <v-icon @click="alertCancel(item)" normal class="mr-2" title="Cancel">mdi-cancel</v-icon>
+                </div>
+              </template>
+            </v-data-table>
+      <!-- <v-data-table
         :headers="headers"
         :items="todelivered"
         :items-per-page="10"
@@ -57,6 +128,38 @@
         <template v-slot:item.order_status="{ item }">
           <v-chip :color="getColor(item.order_status)" dark>{{ item.order_status }}</v-chip>
         </template>
+        <template v-slot:item.line_items="{ item }">
+                <div class="text-center">
+                  <v-dialog v-model="dialog" width="500">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
+                    </template>
+
+                    <v-card>
+                      <v-simple-table v-for="i in item.line_items" :key="i.product_name">
+                        <template v-slot:default>
+                          <thead>
+                            <tr>
+                              <th class="text-left">{{i.product_name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>{{ item.order_quantity }}</td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+                      <v-divider></v-divider>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </div>
+              </template> -->
         <!-- <template v-slot:item.action="{ item }">
           <div v-if="isAdmin() === true">
             <div v-if="isCanceled(item) === true || isDelivered(item) === true">
@@ -120,7 +223,7 @@
             </div>
           </div>
         </template> -->
-      </v-data-table>
+      <!-- </v-data-table> -->
     </v-card>
   </div>
 </template>
@@ -138,46 +241,62 @@ export default {
   components: { OrderToDeliverPdf },
   data() {
     return {
+      dialog: false,
       todelivered: [],
       is_empty: false,
       headers: [
         {
-          text: "Receiver Name",
+          text: "Name",
           align: "start",
           sortable: false,
-          value: "receiver_name"
-        },
-        { text: "Address", value: "customer_address", sortable: false },
-        { text: "Mobile Number", value: "contact_number", sortable: false },
-        { text: "Distance", value: "distance" },
-        {
-          text: "Delivery Date",
-          value: "preferred_delivery_date",
-          sortable: false
+          value: "receiver_name",
+          width: "150px"
         },
         {
-          text: "Ube Halaya Jar(Quantity)",
-          value: "ubehalayajar_qty",
-          sortable: false
-        },
-        {
-          text: "Ube Halaya Tub(Quantity)",
-          value: "ubehalayatub_qty",
-          sortable: false
-        },
-        {
-          text: "Total Item",
-          value: "total_item",
-          sortable: false
+          text: "Order Item",
+          sortable: false,
+          value: "line_items"
         },
         {
           text: "Total Payment",
           value: "total_payment",
           sortable: false
         },
-        // { text: "Actions", value: "action", sortable: false },
+        {
+          text: "Time",
+          value: "time",
+          sortable: false,
+          width: "120px"
+        },
+        {
+          text: "Delivery Date",
+          value: "preferred_delivery_date",
+          sortable: false,
+          width: "120px"
+        },
+        {
+          text: "Address",
+          value: "customer_address",
+          sortable: false,
+          width: "270px"
+        },
+        { text: "Contact Number", value: "contact_number", sortable: false },
+        { text: "Distance", value: "distance" },
+        {
+          text: "Mode of Payment",
+          value: "payment_method",
+          sortable: false,
+          width: "120px"
+        },
+        {
+          text: "Payment Status",
+          value: "payment_status",
+          sortable: false,
+          width: "120px"
+        },
+        // { text: "Actions", value: "action", sortable: false, width: "100px" },
         { text: "Status", value: "order_status" }
-      ]
+      ],
     };
   },
   beforeCreate() {
@@ -199,10 +318,10 @@ export default {
     },
     getToDelivered() {
       axios
-        .get(this.url + "/api/posts/delivery", this.config)
+        .get(this.url + "/api/posts/delivery ", this.config)
         .then(response => {
-          this.todelivered = response.data.data;
-
+          this.todelivered = response.data;
+          console.log("to deliver: ", this.todelivered);
           this.todelivered.forEach((order, index) => {
             let {
               building_or_street,
@@ -216,8 +335,9 @@ export default {
               .toString()
               .concat(" ", barangay, " ", city_or_municipality, " ", province);
             this.todelivered[index]["customer_address"] = place;
-            this.todelivered[index]["total_item"] =
-              ubehalayatub_qty + ubehalayajar_qty;
+            this.todelivered[index]["time"] = "1PM - 4PM";
+            // this.todelivered[index]["total_item"] =
+            //   ubehalayatub_qty + ubehalayajar_qty;
           });
         });
     },

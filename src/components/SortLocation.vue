@@ -75,7 +75,7 @@ export default {
       setTimeout(() => {
         this.$vloading.hide();
       }, 1000);
-      var result = response.data.data;
+      var result = response.data;
       // console.log("=====", result);
       result.forEach(element => {
         let {

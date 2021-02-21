@@ -46,7 +46,7 @@
                 </v-toolbar-items>-->
               </v-toolbar>
               <v-divider></v-divider>
-              <v-row>
+              <!-- <v-row>
                 <v-col id="batchCards" v-for="i in orders" :key="i.id">
                   <v-card
                     id="cards"
@@ -67,7 +67,7 @@
                         <b>No. of Orders:</b>
                         &nbsp;{{i.orders.length}}
                       </span>
-                      <br>
+                      <br> -->
                       <!-- <div v-show="isComplete(i) === true">
                         <v-btn rounded class="white--text" color="success" depressed>
                           Completed
@@ -82,18 +82,19 @@
                           </v-btn>
                         </v-badge>
                       </div>-->
-                    </v-card-text>
+                    <!-- </v-card-text>
                     <v-btn outlined @click="viewDetails(i)" color="purple">View Details</v-btn>
                     <br>
                   </v-card>
                 </v-col>
-              </v-row>
+              </v-row> -->
             </v-card>
           </v-dialog>
         </v-row>
       </template>
     </v-card>
-    <v-dialog max-width="1000" v-model="detailsDialog">
+
+    <!-- <v-dialog max-width="1000" v-model="detailsDialog">
       <template>
         <v-data-table
           :headers="headers"
@@ -169,7 +170,7 @@
           </template>
         </v-data-table>
       </template>
-    </v-dialog>
+    </v-dialog> -->
   </div>
 </template>
 
@@ -368,7 +369,7 @@ export default {
           setTimeout(() => {
             this.$vloading.hide();
           }, 1000);
-          var result = response.data.data;
+          var result = response.data;
           let groupByMunicipality = {};
           // let groupedOrders = {};
           result.forEach(municipyo => {
@@ -389,46 +390,47 @@ export default {
               groupByMunicipality[city_or_municipality].length
             );
           });
+          console.log("data grouping: ", groupByMunicipality);
 
-          let deliveries = {};
-          const MAX_QUANTITY = 96;
+          // let deliveries = {};
+          // const MAX_QUANTITY = 96;
 
-          const createBatches = (barangayOrders, callback) => {
-            let currentAmount = 0;
-            let arr = [];
-            barangayOrders.forEach((order, idx) => {
-              let { ubehalayajar_qty, ubehalayatub_qty } = order;
-              let total = ubehalayajar_qty + ubehalayatub_qty * 4;
-              if (total + currentAmount <= MAX_QUANTITY) {
-                arr.push(order);
-                currentAmount += total;
-                barangayOrders.splice(idx, 1);
-              }
-            });
-            callback(arr, currentAmount);
-            if (barangayOrders.length !== 0) {
-              createBatches(barangayOrders, callback);
-            }
-          };
+          // const createBatches = (barangayOrders, callback) => {
+          //   let currentAmount = 0;
+          //   let arr = [];
+          //   barangayOrders.forEach((order, idx) => {
+          //     let { ubehalayajar_qty, ubehalayatub_qty } = order;
+          //     let total = ubehalayajar_qty + ubehalayatub_qty * 4;
+          //     if (total + currentAmount <= MAX_QUANTITY) {
+          //       arr.push(order);
+          //       currentAmount += total;
+          //       barangayOrders.splice(idx, 1);
+          //     }
+          //   });
+          //   callback(arr, currentAmount);
+          //   if (barangayOrders.length !== 0) {
+          //     createBatches(barangayOrders, callback);
+          //   }
+          // };
 
-          for (const city_mun in groupByMunicipality) {
-            for (const byBrgy in groupByMunicipality[city_mun]) {
-              createBatches(
-                groupByMunicipality[city_mun][byBrgy],
-                (batch, total) => {
-                  var brgy_city_name = byBrgy + ", " + city_mun;
-                  if (!deliveries.hasOwnProperty(brgy_city_name)) {
-                    deliveries[brgy_city_name] = [];
-                  }
-                  deliveries[brgy_city_name].push({
-                    batchNo: deliveries[brgy_city_name].length + 1,
-                    total,
-                    orders: batch
-                  });
-                }
-              );
-            }
-          }
+          // for (const city_mun in groupByMunicipality) {
+          //   for (const byBrgy in groupByMunicipality[city_mun]) {
+          //     createBatches(
+          //       groupByMunicipality[city_mun][byBrgy],
+          //       (batch, total) => {
+          //         var brgy_city_name = byBrgy + ", " + city_mun;
+          //         if (!deliveries.hasOwnProperty(brgy_city_name)) {
+          //           deliveries[brgy_city_name] = [];
+          //         }
+          //         deliveries[brgy_city_name].push({
+          //           batchNo: deliveries[brgy_city_name].length + 1,
+          //           total,
+          //           orders: batch
+          //         });
+          //       }
+          //     );
+          //   }
+          // }
 
           for (const key in deliveries) {
             deliveries[key]["barangay_name"] = key;
