@@ -38,7 +38,7 @@
               ></v-text-field>
             </v-col>
           </v-row>
-              <v-row>
+              <!-- <v-row>
              <v-col cols="6" class="pl-5" >
               <v-img  width="250px" height="200px" src="../assets/halayaJar.jpg"></v-img>
               <h6 class="display-1 font-weight-light orange--text ml-5">{{jarName}}</h6>
@@ -49,8 +49,8 @@
                <h6 class="display-1 font-weight-light orange--text ">{{tubName}}</h6>
                 <div id="price" class="font-weight-light grey--text title ">{{tubPrice}}</div>
             </v-col>
-          </v-row>
-          <v-row >
+          </v-row> -->
+          <!-- <v-row >
             <v-col cols="6" >
               <v-text-field min="0" type="number" label="Quantity" v-model="jarQuantity">
                 <template slot="prepend">
@@ -71,6 +71,23 @@
                 </template>
               </v-text-field>
             </v-col>
+          </v-row> -->
+          <v-row>
+                <v-col cols="6">
+                <v-select
+                  label="Product Name"
+                  v-model="product_name"
+                  :items="availableProducts"
+                ></v-select>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                type="number"
+                  v-model="product_quantity"
+                  label="Product Quantity"
+                  v-bind:disabled="disabled"
+                ></v-text-field>
+              </v-col>
           </v-row>
         </v-container>
         <v-card-actions>
@@ -80,6 +97,11 @@
       </v-card>
       </v-form>
       </center>
+      <v-dialog v-model="post" width="500">
+        <v-text-field                   v-model="product_price"
+></v-text-field>
+      </v-dialog>
+
     </div>  
 </template>
 <script>
@@ -96,20 +118,26 @@ export default {
     name:"Walkin",
   data() {
     return {
+      post:false,
       valid: true,
       loading: false,
+      product_price:null,
       accessToken:
         "pk.eyJ1IjoiamllbnhpeWEiLCJhIjoiY2tlaTM3d2VrMWcxczJybjc0cmZkamk3eiJ9.JzrYlG2kZ08Pkk24hvKDJw",
       menu: false,
       btnDisable: true,
       addOrderDialog: false,
+      availableProducts:{},
       customerStreet: "Shambala Veterinary Clinic Hernan Cortes Street",
       customerBarangay: "Bakilid",
       customerCity: "Mandaue city",
       customerProvince: "Cebu",
+      landmark:'Jollibee',
       longitude: 123.921969,
       latitude: 10.329892,
       postcode: 6014,
+      product_quantity:0,
+      product_name:null,
       customerName: null,
       contactNumber: null,
       orderQuantity: null,
@@ -228,6 +256,7 @@ export default {
   created(){
     this.getHalayaJar()
     this.getHalayaTub()
+    this.getProduct()
 
   },
 
@@ -248,28 +277,28 @@ export default {
 
     placeOrder() {
       this.$vloading.show();
-      if (this.jarQuantity=='0' && this.tabQuantity=='0' ){
-            setTimeout(() => {
-        this.$vloading.hide()
-         }, 1000) 
-         Swal.fire({
-        position: "center",
-        icon: "warning",
-        title: "No order",
-        showConfirmButton: false,
-        timer: 1500
-      });
-      } else if(this.jarQuantity <0 ||this.tabQuantity <0){
-        this.$vloading.hide()
-        Swal.fire({
-          position: "center",
-          icon: "warning",
-          title: "Your quantity must not be less than 0",
-          showConfirmButton: false,
-          timer: 1500
-        });
-      }
-      else if(this.customerName == null ||
+      //if (this.jarQuantity=='0' && this.tabQuantity=='0' ){
+      //       setTimeout(() => {
+      //   this.$vloading.hide()
+      //    }, 1000) 
+      //    Swal.fire({
+      //   position: "center",
+      //   icon: "warning",
+      //   title: "No order",
+      //   showConfirmButton: false,
+      //   timer: 1500
+      // });
+      // } else if(this.jarQuantity <0 ||this.tabQuantity <0){
+      //   this.$vloading.hide()
+      //   Swal.fire({
+      //     position: "center",
+      //     icon: "warning",
+      //     title: "Your quantity must not be less than 0",
+      //     showConfirmButton: false,
+      //     timer: 1500
+      //   });
+      // }
+       if(this.customerName == null ||
       this.contactNumber == null){
           this.$v.$touch();
            this.$vloading.hide()
@@ -302,26 +331,26 @@ export default {
           var dist = turf.distance(from_place, to_place, options);
 
           let param = {
-            customer_id: localStorage.getItem("id"),
+            //customer_id: localStorage.getItem("id"),
             receiver_name: this.customerName,
+            order_id:Math.floor(Math.random() * 3000), 
             building_street: this.customerStreet,
             barangay: this.customerBarangay,
             city_municipality: this.customerCity,
-            province: this.customerProvince,
+            province: 6000,
             contactNumber: this.contactNumber,
-            jar_qty: this.jarQuantity,
-            tub_qty: this.tabQuantity,
-            total_payment: this.totalPay,
             deliveryDate: this.date,
-            orderStatus: 'Delivered',
-            distance: Math.round((dist + Number.EPSILON) * 100) / 100,
-            longitude: this.longitude,
-            latitude: this.latitude,
-            postcode: this.postcode
+            email:'Clark@gmail.com',
+            order_status:'completed',
+            payment_method:'COD',
+            payment_status:'completed',
+            landmark:this.landmark,
+            product_name:this.product_name,
+            product_quantity:this.product_quantity
           };
          
           axios
-            .post(this.url+"/api/post/createOrder", param,this.config)
+            .post(this.url+"/api/post/createWalkin", param,this.config)
             .then(response => {
                 setTimeout(() => {
                 this.$vloading.hide()
@@ -340,6 +369,27 @@ export default {
         });
         } 
     },
+       getProduct(item){
+        this.$vloading.show();
+        axios.get(this.url+"/api/fetchProduct", this.config)
+        .then(response => {
+          var newArray = response.data.map( function( el ){ 
+                                return el.product_name; 
+                               });
+          this.availableProducts = newArray
+        });
+    },
+
+    postOrder(){
+        axios.get(this.url+"/api/postPrice", this.config)
+        .then(response => {
+         console.log(response)
+         this.product_price = response
+         console.log(response)
+        });
+
+    },
+    
     isDisabled: function() {
       return !this.tabQuantity;
     },
@@ -354,8 +404,8 @@ export default {
             setTimeout(() => {
         this.$vloading.hide()
          },1000) 
-          this.tubName=response.data.product[0].product_name
-          this.tubPrice=response.data.product[0].product_price
+          //this.tubName=response.data.product[0].product_name
+          //this.tubPrice=response.data.product[0].product_price
         });
     },
 
@@ -366,8 +416,8 @@ export default {
             setTimeout(() => {
         this.$vloading.hide()
          },1000) 
-          this.jarName=response.data.product[0].product_name
-          this.jarPrice=response.data.product[0].product_price
+          //this.jarName=response.data.product[0].product_name
+          //this.jarPrice=response.data.product[0].product_price
         });
     },
      increaseJar: function() {

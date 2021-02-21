@@ -364,6 +364,7 @@ export default {
       tubName: null,
       tubPrice: null,
       jarPrice: null,
+      dialog: false,
       //   title: "Endorfine",
       gallery: [
         {
@@ -396,7 +397,8 @@ export default {
     };
   },
   created() {
-    this.getHalayaTub(), this.getHalayaJar();
+    this.getHalayaTub(), 
+    this.getHalayaJar();
   },
   methods: {
     getHalayaTub(item) {
@@ -423,7 +425,7 @@ export default {
   },
 
   mounted: function() {
-    this.calculateHeight();
+    // this.calculateHeight();
   }
 };
 </script>

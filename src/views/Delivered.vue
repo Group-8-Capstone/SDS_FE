@@ -59,6 +59,38 @@
       <template v-slot:item.preferred_delivery_date="{ item }">
         <span>{{new Date(item.preferred_delivery_date).toISOString().substring(0,10)}}</span>
       </template>
+      <template v-slot:item.line_items="{ item }">
+                <div class="text-center">
+                  <v-dialog v-model="dialog" width="500">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
+                    </template>
+
+                    <v-card>
+                      <v-simple-table v-for="i in item.line_items" :key="i.product_name">
+                        <template v-slot:default>
+                          <thead>
+                            <tr>
+                              <th class="text-left">{{i.product_name}}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>{{ item.order_quantity }}</td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+                      <v-divider></v-divider>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                </div>
+              </template>
       <template v-slot:item.order_status="{ item }">
         <v-chip color="green" text-color="white">{{ item.order_status }}</v-chip>
       </template>
@@ -101,32 +133,56 @@ export default {
       ],
       headers: [
         {
-          text: "Receiver Name",
+          text: "Name",
           align: "start",
           sortable: false,
-          value: "receiver_name"
-        },
-        { text: "Address", value: "customer_address" },
-        { text: "Mobile Number", value: "contact_number", sortable: false },
-        { text: "Distance", value: "distance" },
-        {
-          text: "Ube Halaya Jar(Quantity)",
-          value: "ubehalayajar_qty",
-          sortable: false
+          value: "receiver_name",
+          width: "150px"
         },
         {
-          text: "Ube Halaya Tub(Quantity)",
-          value: "ubehalayatub_qty",
-          sortable: false
+          text: "Order Item",
+          sortable: false,
+          value: "line_items"
         },
         {
           text: "Total Payment",
           value: "total_payment",
           sortable: false
         },
-        { text: "Delivered Date", value: "preferred_delivery_date" },
-        { text: "Order Status", value: "order_status" }
-      ]
+        {
+          text: "Time",
+          value: "time",
+          sortable: false,
+          width: "120px"
+        },
+        {
+          text: "Delivery Date",
+          value: "preferred_delivery_date",
+          sortable: false,
+          width: "120px"
+        },
+        {
+          text: "Address",
+          value: "customer_address",
+          sortable: false,
+          width: "270px"
+        },
+        { text: "Contact Number", value: "contact_number", sortable: false },
+        { text: "Distance", value: "distance" },
+        {
+          text: "Mode of Payment",
+          value: "payment_method",
+          sortable: false,
+          width: "120px"
+        },
+        {
+          text: "Payment Status",
+          value: "payment_status",
+          sortable: false,
+          width: "120px"
+        },
+        { text: "Status", value: "order_status" }
+      ],
     };
   },
   mounted() {
@@ -151,12 +207,13 @@ export default {
           setTimeout(() => {
             this.$vloading.hide();
           }, 1000);
-          this.deliveredOrder = response.data.data;
+          console.log("delivered: ", response.data)
+          this.deliveredOrder = response.data;
           for (var i = 0; i < this.deliveredOrder.length; i++) {
-            var street = response.data.data[i].building_or_street;
-            var barangay = response.data.data[i].barangay;
-            var city = response.data.data[i].city_or_municipality;
-            var province = response.data.data[i].province;
+            var street = response.data[i].building_or_street;
+            var barangay = response.data[i].barangay;
+            var city = response.data[i].city_or_municipality;
+            var province = response.data[i].province;
             var place = street
               .toString()
               .concat(
@@ -168,6 +225,7 @@ export default {
                 province.toString()
               );
             this.deliveredOrder[i]["customer_address"] = place;
+            this.deliveredOrder[i]["time"] = "1PM - 4PM";
           }
         });
     },
