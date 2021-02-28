@@ -6,10 +6,17 @@
           <!-- <v-spacer></v-spacer> -->
           <v-col class="float-left" cols="2">
             <div>
-              <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                  <div>
-                    <v-btn
+              <!-- <v-menu offset-y>
+              <template v-slot:activator="{ on, attrs }">-->
+              <!-- <div> -->
+              <v-btn @click="isEmpty(deliveredOrder)" class="float-right" outlined color="purple">
+                <download-csv
+                  class="btn btn-default"
+                  :data="deliveredOrder"
+                  name="Delivered.csv"
+                >Export as CSV</download-csv>
+              </v-btn>
+              <!-- <v-btn
                       @click="isEmpty(todelivered)"
                       class="float-left"
                       outlined
@@ -18,22 +25,22 @@
                       v-on="on"
                     >
                       <v-icon>mdi-download</v-icon>Export
-                    </v-btn>
-                  </div>
-                </template>
-                <v-list v-show="is_empty === false">
+              </v-btn>-->
+              <!-- </div> -->
+              <!-- </template> -->
+              <!-- <v-list v-show="is_empty === false">
                   <v-col>
                     <OrderToDeliverPdf :headers="headers" :records="todelivered"></OrderToDeliverPdf>
                     <div>
                       <download-csv
                         class="btn btn-default pa-2"
-                        :data="todelivered"
+                        :data="csvToBeDelivered"
                         name="Deliveries.csv"
                       >Export as CSV</download-csv>
                     </div>
                   </v-col>
-                </v-list>
-              </v-menu>
+              </v-list>-->
+              <!-- </v-menu> -->
             </div>
           </v-col>
         </v-row>
@@ -43,76 +50,76 @@
     <v-card flat>
       <br>
       <v-data-table :headers="headers" :items="todelivered">
-              <template v-slot:item.line_items="{ item }">
-                <div class="text-center">
-                  <v-dialog v-model="dialog" width="500">
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
-                    </template>
-
-                    <v-card>
-                      <v-simple-table v-for="i in item.line_items" :key="i.product_name">
-                        <template v-slot:default>
-                          <thead>
-                            <tr>
-                              <th class="text-left">{{i.product_name}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>{{ item.order_quantity }}</td>
-                            </tr>
-                          </tbody>
-                        </template>
-                      </v-simple-table>
-                      <v-divider></v-divider>
-
-                      <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </div>
+        <template v-slot:item.line_items="{ item }">
+          <div class="text-center">
+            <v-dialog v-model="dialog" width="500">
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
               </template>
 
-              <template v-slot:item.contact_number="{ item }">
-                <span>{{item.contact_number}}</span>
-              </template>
-              <template v-slot:item.distance="{ item }">
-                <span>{{item.distance+' km'}}</span>
-              </template>
-              <template v-slot:item.order_status="{ item }">
-                <v-chip :color="getColor(item.order_status)" dark>{{ item.order_status }}</v-chip>
-              </template>
-              <template v-slot:item.action="{ item }">
-                <div v-if="isCanceled(item) === true">
-                  <v-icon
-                    disabled
-                    @click="editDialog = !editDialog, editItem(item) "
-                    class="mr-2"
-                    normal
-                    title="Edit"
-                  >mdi-table-edit</v-icon>
-                  <v-icon
-                    disabled
-                    @click="alertCancel(item)"
-                    normal
-                    class="mr-2"
-                    title="Cancel"
-                  >mdi-cancel</v-icon>
-                </div>
-                <div v-else>
-                  <v-icon
-                    @click="editDialog = !editDialog, editItem(item) "
-                    class="mr-2"
-                    normal
-                    title="Edit"
-                  >mdi-table-edit</v-icon>
-                  <v-icon @click="alertCancel(item)" normal class="mr-2" title="Cancel">mdi-cancel</v-icon>
-                </div>
-              </template>
-            </v-data-table>
+              <v-card>
+                <v-simple-table v-for="i in item.line_items" :key="i.product_name">
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-left">{{i.product_name}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ item.order_quantity }}</td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+        </template>
+
+        <template v-slot:item.contact_number="{ item }">
+          <span>{{item.contact_number}}</span>
+        </template>
+        <template v-slot:item.distance="{ item }">
+          <span>{{item.distance+' km'}}</span>
+        </template>
+        <template v-slot:item.order_status="{ item }">
+          <v-chip :color="getColor(item.order_status)" dark>{{ item.order_status }}</v-chip>
+        </template>
+        <template v-slot:item.action="{ item }">
+          <div v-if="isCanceled(item) === true">
+            <v-icon
+              disabled
+              @click="editDialog = !editDialog, editItem(item) "
+              class="mr-2"
+              normal
+              title="Edit"
+            >mdi-table-edit</v-icon>
+            <v-icon
+              disabled
+              @click="alertCancel(item)"
+              normal
+              class="mr-2"
+              title="Cancel"
+            >mdi-cancel</v-icon>
+          </div>
+          <div v-else>
+            <v-icon
+              @click="editDialog = !editDialog, editItem(item) "
+              class="mr-2"
+              normal
+              title="Edit"
+            >mdi-table-edit</v-icon>
+            <v-icon @click="alertCancel(item)" normal class="mr-2" title="Cancel">mdi-cancel</v-icon>
+          </div>
+        </template>
+      </v-data-table>
       <!-- <v-data-table
         :headers="headers"
         :items="todelivered"
@@ -159,8 +166,8 @@
                     </v-card>
                   </v-dialog>
                 </div>
-              </template> -->
-        <!-- <template v-slot:item.action="{ item }">
+      </template>-->
+      <!-- <template v-slot:item.action="{ item }">
           <div v-if="isAdmin() === true">
             <div v-if="isCanceled(item) === true || isDelivered(item) === true">
               <v-icon
@@ -222,7 +229,7 @@
               >mdi-cancel</v-icon>
             </div>
           </div>
-        </template> -->
+      </template>-->
       <!-- </v-data-table> -->
     </v-card>
   </div>
@@ -243,6 +250,7 @@ export default {
     return {
       dialog: false,
       todelivered: [],
+      csvToBeDelivered: [],
       is_empty: false,
       headers: [
         {
@@ -296,7 +304,7 @@ export default {
         },
         // { text: "Actions", value: "action", sortable: false, width: "100px" },
         { text: "Status", value: "order_status" }
-      ],
+      ]
     };
   },
   beforeCreate() {
@@ -309,12 +317,37 @@ export default {
   },
   created() {
     this.getToDelivered();
+    this.csvToDeliver();
   },
   methods: {
     getColor(status) {
       if (status === "Canceled") return "orange";
       else if (status === "On order") return "blue";
       else return "green";
+    },
+    csvToDeliver() {
+      axios
+        .get(this.url + "/api/posts/delivery", this.config)
+        .then(response => {
+          this.csvToBeDelivered = response.data.data;
+
+          this.csvToBeDelivered.forEach((order, index) => {
+            let {
+              // building_or_street,
+              // barangay,
+              // city_or_municipality,
+              // province,
+              ubehalayajar_qty,
+              ubehalayatub_qty
+            } = order;
+            var place = building_or_street
+              .toString()
+              .concat(" ", barangay, " ", city_or_municipality, " ", province);
+            this.csvToBeDelivered[index]["customer_address"] = place;
+            this.csvToBeDelivered[index]["total_item"] =
+              ubehalayatub_qty + ubehalayajar_qty;
+          });
+        });
     },
     getToDelivered() {
       axios
@@ -391,7 +424,7 @@ export default {
     //     }
     //   });
     // },
-    
+
     // deliveredItem(item) {
     //   axios
     //     .post(this.url + "/api/post/updateStat/" + item.id, {}, this.config)
