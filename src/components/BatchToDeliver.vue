@@ -63,7 +63,7 @@
                     <hr>
                     <v-spacer/>
                     <v-card-text>
-                      <!-- <span>
+                      <span>
                         <b>No. of Orders:</b>
                         &nbsp;{{i.orders.length}}
                       </span>

@@ -108,7 +108,7 @@
 </v-row>
 </v-sheet>
       <v-divider></v-divider>
-      <template v-if="isCustomer() === true">
+      <!-- <template v-if="isCustomer() === true">
         <v-list>
           <v-list-item
             :key="item.text"
@@ -136,7 +136,7 @@
             </template>
           </v-list-group>
         </v-list>
-      </template>
+      </template> -->
       <template v-if="isAdmin() === true">
         <v-list>
           <v-list-item
@@ -297,18 +297,18 @@ export default {
     ]
   }),
   mounted(){
-    this.confirmPending()
-    this.retrieve()
+    // this.confirmPending()
+    // this.retrieve()
     let pusher = new Pusher('c31b45d58431fd307880', {
       cluster: 'ap1',
       encrypted: false
     });
-    let channel = pusher.subscribe('order-channel')
-    channel.bind('newOrder', data => {
-      this.retrieve(),
-      this.confirmPending(),
-      this.notifCustomerOrder()
-    });
+    // let channel = pusher.subscribe('order-channel')
+    // channel.bind('newOrder', data => {
+    //   // this.retrieve(),
+    //   this.confirmPending()
+    //   // this.notifCustomerOrder()
+    // });
   },
 
   beforeCreate() {
@@ -347,37 +347,37 @@ export default {
         });
   
     },
-  notifCustomerOrder(item){
-      let date = moment(item.created_at).format('MM/DD/YYYY');
-      return item.receiver_name +' '+'ordered ube halaya'+' ' + date
-    },
-    retrieve(){
-      axios.get(this.url + "/api/fetchProcessOrder", this.config).then(response => {
-        this.storeData = response.data.data;
-        this.playSound();
-      axios
-        .get(this.url+"/api/unreadAdminOrder" , this.config)
-        .then(response => {
-        this.count =  response.data.post.length
+  // notifCustomerOrder(item){
+  //     let date = moment(item.created_at).format('MM/DD/YYYY');
+  //     return item.receiver_name +' '+'ordered ube halaya'+' ' + date
+  //   },
+  //   retrieve(){
+  //     axios.get(this.url + "/api/fetchProcessOrder", this.config).then(response => {
+  //       this.storeData = response.data.data;
+  //       this.playSound();
+  //     axios
+  //       .get(this.url+"/api/unreadAdminOrder" , this.config)
+  //       .then(response => {
+  //       this.count =  response.data.post.length
       
-        });
-      })
-    },
+  //       });
+  //     })
+  //   },
     
-    confirmPending(){
-      let id = localStorage.getItem("id");
-      axios
-        .get(this.url+"/api/fetchOngoingOrder/" + id, this.config)
-        .then(response => {
-          this.storeConfirm = response.data.post;
-          this.playSound();
-        });
-      axios
-        .get(this.url+"/api/unReadOrder/" + id, this.config)
-        .then(response => {
-           this.countPending =  response.data.post.length
-        });
-    },
+    // confirmPending(){
+    //   let id = localStorage.getItem("id");
+    //   axios
+    //     .get(this.url+"/api/fetchOngoingOrder/" + id, this.config)
+    //     .then(response => {
+    //       this.storeConfirm = response.data.post;
+    //       // this.playSound();
+    //     });
+    //   axios
+    //     .get(this.url+"/api/unReadOrder/" + id, this.config)
+    //     .then(response => {
+    //        this.countPending =  response.data.post.length
+    //     });
+    // },
     goTo(route) {
       alert(route);
       this.$router.push(route);

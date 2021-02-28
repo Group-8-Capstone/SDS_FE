@@ -3,7 +3,7 @@
     <Header v-if="$route.name== 'Landing'" id="Header"/>
     <v-main>
       <Sidebar
-        v-if="$route.name!= 'Login' && $route.name!= 'Landing' && $route.name!= 'Register' && $route.name!= 'ForgotPassword'"
+        v-if="$route.name!= 'Login' && $route.name!= 'LoginDefault' && $route.name!= 'Landing' && $route.name!= 'Register' && $route.name!= 'ForgotPassword'"
         id="Sidebar"
       />
       <content>

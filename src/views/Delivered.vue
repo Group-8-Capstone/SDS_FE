@@ -19,13 +19,15 @@
             <div>
               <!-- <v-menu offset-y>
                 <template v-slot:activator="{ on, attrs }">
-                  <div> -->
-                    <download-csv
-                        class="btn float-right outlined"
-                        :data="deliveredOrder"
-                        name="Delivered.csv"
-                      >Export as CSV</download-csv>
-                    <!-- <v-btn
+              <div>-->
+              <v-btn @click="isEmpty(deliveredOrder)" class="float-right" outlined color="purple">
+                <download-csv
+                  class="btn btn-default"
+                  :data="deliveredOrder"
+                  name="Delivered.csv"
+                >Export as CSV</download-csv>
+              </v-btn>
+              <!-- <v-btn
                       @click="isEmpty(deliveredOrder)"
                       class="float-right"
                       outlined
@@ -34,10 +36,10 @@
                       v-on="on"
                     >
                       <v-icon>mdi-download</v-icon>Export
-                    </v-btn> -->
-                  <!-- </div>
-                </template> -->
-                <!-- <v-list v-show="is_empty === false">
+              </v-btn>-->
+              <!-- </div>
+              </template>-->
+              <!-- <v-list v-show="is_empty === false">
                   <v-col>
                     <DeliveredPdf :headers="headers" :deliveredOrder="deliveredOrder"></DeliveredPdf>
                     <div>
@@ -48,7 +50,7 @@
                       >Export as CSV</download-csv>
                     </div>
                   </v-col>
-                </v-list> -->
+              </v-list>-->
               <!-- </v-menu> -->
             </div>
           </v-col>
@@ -60,37 +62,37 @@
         <span>{{new Date(item.preferred_delivery_date).toISOString().substring(0,10)}}</span>
       </template>
       <template v-slot:item.line_items="{ item }">
-                <div class="text-center">
-                  <v-dialog v-model="dialog" width="500">
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
-                    </template>
+        <div class="text-center">
+          <v-dialog v-model="dialog" width="500">
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
+            </template>
 
-                    <v-card>
-                      <v-simple-table v-for="i in item.line_items" :key="i.product_name">
-                        <template v-slot:default>
-                          <thead>
-                            <tr>
-                              <th class="text-left">{{i.product_name}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>{{ item.order_quantity }}</td>
-                            </tr>
-                          </tbody>
-                        </template>
-                      </v-simple-table>
-                      <v-divider></v-divider>
+            <v-card>
+              <v-simple-table v-for="i in item.line_items" :key="i.product_name">
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="text-left">{{i.product_name}}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{ item.order_quantity }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+              <v-divider></v-divider>
 
-                      <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </div>
-              </template>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+      </template>
       <template v-slot:item.order_status="{ item }">
         <v-chip color="green" text-color="white">{{ item.order_status }}</v-chip>
       </template>
@@ -182,7 +184,7 @@ export default {
           width: "120px"
         },
         { text: "Status", value: "order_status" }
-      ],
+      ]
     };
   },
   mounted() {
@@ -197,9 +199,8 @@ export default {
     this.config = config;
   },
   methods: {
-
     //fetch all data
-    loadDelivered() {                      
+    loadDelivered() {
       this.$vloading.show();
       axios
         .get(this.url + "/api/posts/delivered", this.config)
@@ -207,7 +208,7 @@ export default {
           setTimeout(() => {
             this.$vloading.hide();
           }, 1000);
-          console.log("delivered: ", response.data)
+          console.log("delivered: ", response.data);
           this.deliveredOrder = response.data;
           for (var i = 0; i < this.deliveredOrder.length; i++) {
             var street = response.data[i].building_or_street;
@@ -287,7 +288,9 @@ export default {
         let month_number = this.getMonthNumber(month);
         axios
           .post(
-            this.url + `/api/filter/${month_number}/${year}`, {}, this.config
+            this.url + `/api/filter/${month_number}/${year}`,
+            {},
+            this.config
           )
           .then(response => {
             if (response.data.data.length == 0) {

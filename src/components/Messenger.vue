@@ -213,18 +213,24 @@
           <v-row class="pl-5">
             <v-col md="6" lg="6" sm="12">
               <span>
-                <h4>Jar Quantity:</h4>
-                {{jarQuantity}}
+                <h4>Product:</h4>
+                {{product_name}}
               </span>
             </v-col>
             <v-col md="6" lg="6" sm="12">
               <span>
-                <h4>Tub Quantity:</h4>
-                {{tabQuantity}}
+                <h4>Product Quantity:</h4>
+                {{product_quantity}}
               </span>
             </v-col>
           </v-row>
           <v-row class="pl-5">
+            <v-col md="6" lg="6" sm="12">
+            <span>
+              <h4>Product Price:</h4>
+              {{product_price}}
+            </span>
+          </v-col>
           <v-col md="6" lg="6" sm="12">
             <span>
               <h4>Your Total Payment:</h4>
@@ -312,6 +318,7 @@ export default {
       customerStreet: null,
       customerBarangay: null,
       customerProvince: "Cebu",
+      landmark: null,
       customerName: null,
       contactNumber: null,
       orderQuantity: null,
@@ -327,6 +334,7 @@ export default {
       jarPrice: null,
       counterJar: 0,
       counterTub: 0,
+      disabled: false,
       disableButton: false,
       addCardDialog: false,
       totalPay: 0,
@@ -442,8 +450,9 @@ export default {
     this.config = config;
   },
   created() {
-    this.getHalayaTub(), 
-    this.getHalayaJar();
+    // this.getHalayaTub(), 
+    // this.getHalayaJar();
+    this.getProduct();
   },
   methods: {
     showDialog() {
@@ -460,7 +469,16 @@ export default {
       this.tabQuantity = 0;
       this.orderQuantity = null;
       this.date = null;
-    },   
+    },  
+    getProduct(item) {
+      this.$vloading.show();
+      axios.get(this.url + "/api/fetchProduct", this.config).then(response => {
+        var newArray = response.data.map(function(el) {
+          return el.product_name;
+        });
+        this.availableProducts = newArray;
+      });
+    },
     submit(customer_municipality){
       if( this.customerName == null ||
         this.contactNumber==null ||
@@ -552,22 +570,22 @@ export default {
           var dist = turf.distance(from_place, to_place, options);
 
           let param = {
-            customer_id: localStorage.getItem("id"),
+            // customer_id: localStorage.getItem("id"),
             receiver_name: this.customerName,
-            building_street: street,
-            barangay: barangay,
-            city_municipality: municipality,
-            province: province,
+            order_id:Math.floor(Math.random() * 3000), 
+            landmark: this.customerStreet,
+            barangay: this.customerBarangay,
+            city_municipality: this.customerMunicipality,
+            province: 6000,
             contactNumber: this.contactNumber,
-            jar_qty: this.jarQuantity,
-            tub_qty: this.tabQuantity,
-            total_payment: this.totalPay,
             deliveryDate: this.date,
-            orderStatus: this.getOrderStatus(this.jarQuantity),
-            distance: Math.round((dist + Number.EPSILON) * 100) / 100,
-            longitude: result.features[0].geometry.coordinates[0],
-            latitude: result.features[0].geometry.coordinates[1],
-            postcode: this.getPostalCode(municipality)
+            email:'Clark@gmail.com',
+            order_status:'On order',
+            total_payment: this.totalPay,
+            payment_method:'COD',
+            payment_status:'pending',
+            product_name:this.product_name,
+            product_quantity:this.product_quantity
           };
           console.log('----', param)
           axios
@@ -603,7 +621,7 @@ export default {
       var total_order_qty =
         parseInt(this.jarQuantity) + parseInt(this.tabQuantity) * 4;
       var maximum_order_qty = 96;
-      if (this.jarQuantity == 0 && this.tabQuantity == 0) {
+      if (this.product_quantity ==  0) {
         Swal.fire({
           position: "center",
           icon: "warning",
@@ -646,7 +664,7 @@ export default {
         this.addCardDialog = true;
         this.addOrderDialog = false;
         this.totalPay =
-          this.jarQuantity * this.jarPrice + this.tabQuantity * this.tubPrice;
+          this.product_quantity * this.product_price;
       }
     },
     notLessDate(deliveredDate) {
