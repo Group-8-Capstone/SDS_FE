@@ -289,7 +289,7 @@ export default {
           width: "270px"
         },
         { text: "Contact Number", value: "contact_number", sortable: false },
-        { text: "Distance", value: "distance" },
+        // { text: "Distance", value: "distance" },
         {
           text: "Mode of Payment",
           value: "payment_method",

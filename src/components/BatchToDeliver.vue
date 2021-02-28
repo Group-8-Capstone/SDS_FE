@@ -370,6 +370,7 @@ export default {
             this.$vloading.hide();
           }, 1000);
           var result = response.data;
+          console.log("====", result)
           let groupByMunicipality = {};
           // let groupedOrders = {};
           result.forEach(municipyo => {
@@ -392,7 +393,7 @@ export default {
           });
           console.log("data grouping: ", groupByMunicipality);
 
-          // let deliveries = {};
+          let deliveries = {};
           // const MAX_QUANTITY = 96;
 
           // const createBatches = (barangayOrders, callback) => {
@@ -413,28 +414,31 @@ export default {
           //   }
           // };
 
-          // for (const city_mun in groupByMunicipality) {
-          //   for (const byBrgy in groupByMunicipality[city_mun]) {
-          //     createBatches(
-          //       groupByMunicipality[city_mun][byBrgy],
-          //       (batch, total) => {
-          //         var brgy_city_name = byBrgy + ", " + city_mun;
-          //         if (!deliveries.hasOwnProperty(brgy_city_name)) {
-          //           deliveries[brgy_city_name] = [];
-          //         }
-          //         deliveries[brgy_city_name].push({
-          //           batchNo: deliveries[brgy_city_name].length + 1,
-          //           total,
-          //           orders: batch
-          //         });
-          //       }
-          //     );
-          //   }
-          // }
+          for (const city_mun in groupByMunicipality) {
+            for (const byBrgy in groupByMunicipality[city_mun]) {
+             
+              // createBatches(
+              //   groupByMunicipality[city_mun][byBrgy],
+              //   (batch, total) => {
+                  var brgy_city_name = byBrgy + ", " + city_mun;
+                  if (!deliveries.hasOwnProperty(brgy_city_name)) {
+                    deliveries[brgy_city_name] = [];
+                  }
+                  deliveries[brgy_city_name].push({
+                    // batchNo: deliveries[brgy_city_name].length + 1,
+                    // total,
+                    orders: batch
+                  });
+              //   }
+              // );
+            }
+          }
+ console.log("===>>", deliveries)
 
           for (const key in deliveries) {
             deliveries[key]["barangay_name"] = key;
             this.deliveriesByBrngy = deliveries;
+            // this.deliveriesByBrngy = groupByMunicipality;
           }
         });
     },

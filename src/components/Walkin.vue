@@ -75,15 +75,15 @@
                 <v-select label="Product Name" v-model="product_name" :items="availableProducts"></v-select>
               </v-col>
               <v-col cols="6">
-                <v-text-field
-                  type="number"
-                  v-model="product_quantity"
-                  label="Product Quantity"
-                  v-bind:disabled="disabled"
-                ></v-text-field>
+                <v-text-field type="number" v-model="product_quantity" label="Product Quantity"></v-text-field>
               </v-col>
             </v-row>
+            <ul id="example-1">
+              <li v-for="(item) in anotherProduct" :key="item.key">{{ item.product_name }}</li>
+            </ul>
           </v-container>
+          <v-btn outlined color="purple darken-2" @click="addProduct()">ADD PRODUCT</v-btn>
+
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn outlined color="purple darken-2" @click="placeOrder()">ADD ORDER</v-btn>
@@ -100,6 +100,7 @@
 import Swal from "sweetalert2";
 import axios from "axios";
 import { setInterval } from "timers";
+import $ from "jquery";
 import {
   required,
   minLength,
@@ -119,7 +120,7 @@ export default {
       menu: false,
       btnDisable: true,
       addOrderDialog: false,
-      availableProducts: {},
+      availableProducts: [],
       customerStreet: "Shambala Veterinary Clinic Hernan Cortes Street",
       customerBarangay: "Bakilid",
       customerCity: "Mandaue city",
@@ -129,6 +130,7 @@ export default {
       latitude: 10.329892,
       postcode: 6014,
       product_quantity: 0,
+      anotherProduct: [],
       product_name: null,
       customerName: null,
       contactNumber: null,
@@ -334,9 +336,11 @@ export default {
               payment_method: "COD",
               payment_status: "completed",
               landmark: this.landmark,
-              product_name: this.product_name,
-              product_quantity: this.product_quantity
+              order_items: this.anotherProduct
+              // product_name:this.product_name,
+              // product_quantity:this.product_quantity
             };
+            console.log("-->>", param);
 
             axios
               .post(this.url + "/api/post/createWalkin", param, this.config)
@@ -368,6 +372,15 @@ export default {
       });
     },
 
+    addProduct() {
+      let prod = {
+        product_name: this.product_name,
+        product_quantity: this.product_quantity
+      };
+      this.anotherProduct.push(prod);
+
+      console.log(this.anotherProduct);
+    },
     postOrder() {
       axios.get(this.url + "/api/postPrice", this.config).then(response => {
         console.log(response);
