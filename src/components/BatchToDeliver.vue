@@ -15,12 +15,12 @@
                     min-width="300"
                     max-width="300"
                   >
-                    <v-card-title class="deep-purple lighten-5" id="title">{{item.barangay_name}}</v-card-title>
+                    <v-card-title class="deep-purple lighten-5" id="title">{{item.brgy_name}}</v-card-title>
                     <hr>
                     <v-spacer/>
                     <v-card-text id="qty">
-                      <b>Number of Batch:</b>
-                      {{item.length}}
+                      <b>Number of Orders:</b>
+                      {{item}}
                     </v-card-text>
                     <v-btn
                       outlined
@@ -46,6 +46,81 @@
                 </v-toolbar-items>-->
               </v-toolbar>
               <v-divider></v-divider>
+              <template>
+                <v-data-table :headers="headers" :items="orders" class="elevation-1">
+                  <template v-slot:item.order_status="{ item }">
+                    <v-chip :color="getColor(item.order_status)" dark>{{ item.order_status }}</v-chip>
+                  </template>
+                  <template v-slot:item.action="{ item }">
+                    <div v-if="isAdmin() === true">
+                      <div v-if="isCanceled(item) === true || isDelivered(item) === true">
+                        <v-icon
+                          disabled
+                          normal
+                          class="mr-2"
+                          title="Delivered"
+                          @click="alertDelivered(item)"
+                        >mdi-truck-check-outline</v-icon>
+                        <v-icon
+                          disabled
+                          @click="alertCancel(item)"
+                          normal
+                          class="mr-2"
+                          title="Cancel"
+                        >mdi-cancel</v-icon>
+                      </div>
+                      <div v-else>
+                        <v-icon
+                          disabled
+                          normal
+                          class="mr-2"
+                          title="Delivered"
+                          @click="alertDelivered(item)"
+                        >mdi-truck-check-outline</v-icon>
+                        <v-icon
+                          @click="alertCancel(item)"
+                          normal
+                          class="mr-2"
+                          title="Cancel"
+                        >mdi-cancel</v-icon>
+                      </div>
+                    </div>
+                    <div v-if="isRider() === true">
+                      <div v-if="isCanceled(item) === true || isDelivered(item) === true">
+                        <v-icon
+                          disabled
+                          normal
+                          class="mr-2"
+                          title="Delivered"
+                          @click="alertDelivered(item)"
+                        >mdi-truck-check-outline</v-icon>
+                        <v-icon
+                          disabled
+                          @click="alertCancel(item)"
+                          normal
+                          class="mr-2"
+                          title="Cancel"
+                        >mdi-cancel</v-icon>
+                      </div>
+                      <div v-else>
+                        <v-icon
+                          normal
+                          class="mr-2"
+                          title="Delivered"
+                          @click="alertDelivered(item)"
+                        >mdi-truck-check-outline</v-icon>
+                        <v-icon
+                          disabled
+                          @click="alertCancel(item)"
+                          normal
+                          class="mr-2"
+                          title="Cancel"
+                        >mdi-cancel</v-icon>
+                      </div>
+                    </div>
+                  </template>
+                </v-data-table>
+              </template>
               <!-- <v-row>
                 <v-col id="batchCards" v-for="i in orders" :key="i.id">
                   <v-card
@@ -67,27 +142,27 @@
                         <b>No. of Orders:</b>
                         &nbsp;{{i.orders.length}}
                       </span>
-                      <br> -->
-                      <!-- <div v-show="isComplete(i) === true">
+              <br>-->
+              <!-- <div v-show="isComplete(i) === true">
                         <v-btn rounded class="white--text" color="success" depressed>
                           Completed
                           <v-icon dark right>mdi-checkbox-marked-circle</v-icon>
                         </v-btn>
-                      </div>-->
-                      <!-- <div v-if="isCanceled(i) === true">
+              </div>-->
+              <!-- <div v-if="isCanceled(i) === true">
                         <v-badge bordered color="warning" dot overlap>
                           <v-btn rounded class="white--text" color="success" depressed>
                             Completed
                             <v-icon dark right>mdi-checkbox-marked-circle</v-icon>
                           </v-btn>
                         </v-badge>
-                      </div>-->
-                    <!-- </v-card-text>
+              </div>-->
+              <!-- </v-card-text>
                     <v-btn outlined @click="viewDetails(i)" color="purple">View Details</v-btn>
                     <br>
                   </v-card>
                 </v-col>
-              </v-row> -->
+              </v-row>-->
             </v-card>
           </v-dialog>
         </v-row>
@@ -170,7 +245,7 @@
           </template>
         </v-data-table>
       </template>
-    </v-dialog> -->
+    </v-dialog>-->
   </div>
 </template>
 
@@ -261,6 +336,7 @@ export default {
       else return "green";
     },
     viewOrders(item) {
+      console.log("item: ", item);
       this.orders = item;
       this.barangay_name = item.barangay_name;
       this.dialog = true;
@@ -370,7 +446,7 @@ export default {
             this.$vloading.hide();
           }, 1000);
           var result = response.data;
-          console.log("====", result)
+          // console.log("====", result)
           let groupByMunicipality = {};
           // let groupedOrders = {};
           result.forEach(municipyo => {
@@ -391,55 +467,60 @@ export default {
               groupByMunicipality[city_or_municipality].length
             );
           });
-          console.log("data grouping: ", groupByMunicipality);
 
-          let deliveries = {};
+          for (const city_mun in groupByMunicipality) {
+            for (const byBrgy in groupByMunicipality[city_mun]) {
+              var brgy_city_name = byBrgy + ", " + city_mun;
+              this.deliveriesByBrngy['brgy_name'] = brgy_city_name;
+              this.deliveriesByBrngy['length'] = groupByMunicipality[city_mun][byBrgy].length;
+              this.deliveriesByBrngy['orders'] = groupByMunicipality[city_mun][byBrgy];
+            }
+          }
+
+          console.log("----", this.deliveriesByBrngy.toArray())
+
+          // let deliveries = {};
           // const MAX_QUANTITY = 96;
 
           // const createBatches = (barangayOrders, callback) => {
-          //   let currentAmount = 0;
-          //   let arr = [];
-          //   barangayOrders.forEach((order, idx) => {
-          //     let { ubehalayajar_qty, ubehalayatub_qty } = order;
-          //     let total = ubehalayajar_qty + ubehalayatub_qty * 4;
-          //     if (total + currentAmount <= MAX_QUANTITY) {
-          //       arr.push(order);
-          //       currentAmount += total;
-          //       barangayOrders.splice(idx, 1);
-          //     }
-          //   });
-          //   callback(arr, currentAmount);
+          //   // let currentAmount = 0;
+          //   // let arr = [];
+          //   // barangayOrders.forEach((order, idx) => {
+          //   //   let { ubehalayajar_qty, ubehalayatub_qty } = order;
+          //   //   let total = ubehalayajar_qty + ubehalayatub_qty * 4;
+          //   //   if (total + currentAmount <= MAX_QUANTITY) {
+          //   //     arr.push(order);
+          //   //     currentAmount += total;
+          //   //     barangayOrders.splice(idx, 1);
+          //   //   }
+          //   // });
+          //   // callback(arr, currentAmount);
           //   if (barangayOrders.length !== 0) {
           //     createBatches(barangayOrders, callback);
           //   }
           // };
 
-          for (const city_mun in groupByMunicipality) {
-            for (const byBrgy in groupByMunicipality[city_mun]) {
-             
-              // createBatches(
-              //   groupByMunicipality[city_mun][byBrgy],
-              //   (batch, total) => {
-                  var brgy_city_name = byBrgy + ", " + city_mun;
-                  if (!deliveries.hasOwnProperty(brgy_city_name)) {
-                    deliveries[brgy_city_name] = [];
-                  }
-                  deliveries[brgy_city_name].push({
-                    // batchNo: deliveries[brgy_city_name].length + 1,
-                    // total,
-                    orders: batch
-                  });
-              //   }
-              // );
-            }
-          }
- console.log("===>>", deliveries)
-
-          for (const key in deliveries) {
-            deliveries[key]["barangay_name"] = key;
-            this.deliveriesByBrngy = deliveries;
-            // this.deliveriesByBrngy = groupByMunicipality;
-          }
+          // for (const city_mun in groupByMunicipality) {
+          //   for (const byBrgy in groupByMunicipality[city_mun]) {
+          //  console.log("*****", groupByMunicipality[city_mun][byBrgy]);
+          // createBatches(
+          //   groupByMunicipality[city_mun][byBrgy],
+          //   (batch, total) => {
+          // var brgy_city_name = byBrgy + ", " + city_mun;
+          // if (!deliveries.hasOwnProperty(brgy_city_name)) {
+          //   deliveries[brgy_city_name] = [];
+          // }
+          // deliveries[brgy_city_name].push({
+          // batchNo: deliveries[brgy_city_name].length + 1,
+          // total,
+          // orders: batch
+          // orders: groupByMunicipality[city_mun][byBrgy]
+          // });
+          //   }
+          // );
+          // }
+          // }
+          // consol  e.log("deliveries", deliveries)
         });
     },
     isAdmin() {
