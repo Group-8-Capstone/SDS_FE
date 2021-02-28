@@ -1,44 +1,42 @@
 <template>
-<div>
-  <center>
-    <v-form ref="form"
-    v-model="valid"
-    lazy-validation>
-     <v-card style="max-width:800px;height:auto;" class="mb-12" >
-        <v-spacer></v-spacer>
-        <v-card-title class="align-center">
-          <v-list-item-title
-            class="d-flex align-center justify-center mx-auto headline black--text"
-          >ADD ORDER</v-list-item-title>
-        </v-card-title>
-        <v-container>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field
-                prepend-icon="mdi-account-outline"
-                label="Customer Name"
-                v-model="customerName"
-                :error-messages="customerErrors"
-                @input="$v.customerName.$touch()"
-                @blur="$v.customerName.$touch()"
-                required
-              ></v-text-field>
-            </v-col>
-            <v-col cols="6" >
-              <v-text-field
-                type="number"
-                prepend-icon="mdi-phone"
-                label="Mobile Number"
-                v-model="contactNumber"
-                :rules="contactRules"
-                :error-messages="contactNumberErrors"
-                @input="$v.contactNumber.$touch()"
-                @blur="$v.contactNumber.$touch()"
-                required
-              ></v-text-field>
-            </v-col>
-          </v-row>
-              <!-- <v-row>
+  <div>
+    <center>
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <v-card style="max-width:800px;height:auto;" class="mb-12">
+          <v-spacer></v-spacer>
+          <v-card-title class="align-center">
+            <v-list-item-title
+              class="d-flex align-center justify-center mx-auto headline black--text"
+            >ADD ORDER</v-list-item-title>
+          </v-card-title>
+          <v-container>
+            <v-row>
+              <v-col cols="6">
+                <v-text-field
+                  prepend-icon="mdi-account-outline"
+                  label="Customer Name"
+                  v-model="customerName"
+                  :error-messages="customerErrors"
+                  @input="$v.customerName.$touch()"
+                  @blur="$v.customerName.$touch()"
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  type="number"
+                  prepend-icon="mdi-phone"
+                  label="Mobile Number"
+                  v-model="contactNumber"
+                  :rules="contactRules"
+                  :error-messages="contactNumberErrors"
+                  @input="$v.contactNumber.$touch()"
+                  @blur="$v.contactNumber.$touch()"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <!-- <v-row>
              <v-col cols="6" class="pl-5" >
               <v-img  width="250px" height="200px" src="../assets/halayaJar.jpg"></v-img>
               <h6 class="display-1 font-weight-light orange--text ml-5">{{jarName}}</h6>
@@ -49,8 +47,8 @@
                <h6 class="display-1 font-weight-light orange--text ">{{tubName}}</h6>
                 <div id="price" class="font-weight-light grey--text title ">{{tubPrice}}</div>
             </v-col>
-          </v-row> -->
-          <!-- <v-row >
+            </v-row>-->
+            <!-- <v-row >
             <v-col cols="6" >
               <v-text-field min="0" type="number" label="Quantity" v-model="jarQuantity">
                 <template slot="prepend">
@@ -71,43 +69,38 @@
                 </template>
               </v-text-field>
             </v-col>
-          </v-row> -->
-          <v-row>
-                <v-col cols="6">
-                <v-select
-                  label="Product Name"
-                  v-model="product_name"
-                  :items="availableProducts"
-                ></v-select>
+            </v-row>-->
+            <v-row>
+              <v-col cols="6">
+                <v-select label="Product Name" v-model="product_name" :items="availableProducts"></v-select>
               </v-col>
               <v-col cols="6">
-                <v-text-field
-                type="number"
-                  v-model="product_quantity"
-                  label="Product Quantity"
-                  v-bind:disabled="disabled"
-                ></v-text-field>
+                <v-text-field type="number" v-model="product_quantity" label="Product Quantity"></v-text-field>
               </v-col>
-          </v-row>
-        </v-container>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn outlined color="purple darken-2" @click="placeOrder()">ADD ORDER</v-btn>
-        </v-card-actions>
-      </v-card>
-      </v-form>
-      </center>
-      <v-dialog v-model="post" width="500">
-        <v-text-field                   v-model="product_price"
-></v-text-field>
-      </v-dialog>
+            </v-row>
+            <ul id="example-1">
+              <li v-for="(item) in anotherProduct" :key="item.key">{{ item.product_name }}</li>
+            </ul>
+          </v-container>
+          <v-btn outlined color="purple darken-2" @click="addProduct()">ADD PRODUCT</v-btn>
 
-    </div>  
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn outlined color="purple darken-2" @click="placeOrder()">ADD ORDER</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </center>
+    <v-dialog v-model="post" width="500">
+      <v-text-field v-model="product_price"></v-text-field>
+    </v-dialog>
+  </div>
 </template>
 <script>
 import Swal from "sweetalert2";
 import axios from "axios";
 import { setInterval } from "timers";
+import $ from "jquery";
 import {
   required,
   minLength,
@@ -115,46 +108,47 @@ import {
   between
 } from "vuelidate/lib/validators";
 export default {
-    name:"Walkin",
+  name: "Walkin",
   data() {
     return {
-      post:false,
+      post: false,
       valid: true,
       loading: false,
-      product_price:null,
+      product_price: null,
       accessToken:
         "pk.eyJ1IjoiamllbnhpeWEiLCJhIjoiY2tlaTM3d2VrMWcxczJybjc0cmZkamk3eiJ9.JzrYlG2kZ08Pkk24hvKDJw",
       menu: false,
       btnDisable: true,
       addOrderDialog: false,
-      availableProducts:{},
+      availableProducts: [],
       customerStreet: "Shambala Veterinary Clinic Hernan Cortes Street",
       customerBarangay: "Bakilid",
       customerCity: "Mandaue city",
       customerProvince: "Cebu",
-      landmark:'Jollibee',
+      landmark: "Jollibee",
       longitude: 123.921969,
       latitude: 10.329892,
       postcode: 6014,
-      product_quantity:0,
-      product_name:null,
+      product_quantity: 0,
+      anotherProduct: [],
+      product_name: null,
       customerName: null,
       contactNumber: null,
       orderQuantity: null,
-      jarName:null,
-      tubName:null,
-      tubPrice:null,
-      jarPrice:null,
+      jarName: null,
+      tubName: null,
+      tubPrice: null,
+      jarPrice: null,
       orderStatus: null,
-      date:  new Date().toISOString().substr(0, 10),
+      date: new Date().toISOString().substr(0, 10),
       jarQuantity: "0",
       tabQuantity: "0",
-      totalPay:0,
+      totalPay: 0,
       distance: 0,
       contactRules: [
-      v => !!v || "Phone number is required",
-      v => /^(09|\+639)\d{9}$/.test(v) || "Input valid phone number"
-    ],
+        v => !!v || "Phone number is required",
+        v => /^(09|\+639)\d{9}$/.test(v) || "Input valid phone number"
+      ]
     };
   },
   validations: {
@@ -185,12 +179,12 @@ export default {
       required
     }
   },
-   beforeCreate() {
-    let config = {}
+  beforeCreate() {
+    let config = {};
     config.headers = {
-      Authorization: 'Bearer ' + localStorage.getItem('token')
-    }
-    this.config = config
+      Authorization: "Bearer " + localStorage.getItem("token")
+    };
+    this.config = config;
   },
 
   computed: {
@@ -253,26 +247,25 @@ export default {
     }
   },
 
-  created(){
-    this.getHalayaJar()
-    this.getHalayaTub()
-    this.getProduct()
-
+  created() {
+    this.getHalayaJar();
+    this.getHalayaTub();
+    this.getProduct();
   },
 
   methods: {
     showDialog() {
       this.$refs.form.reset();
       this.$v.$reset();
-      this.customerStreet = null
-      this.customerBarangay = null
-      this.customerProvince = null
-      this.customerName = null
-      this.contactNumber = null
-      this.orderQuantity = null
-      this.jarQuantity="0"
-      this.tabQuantity="0"
-      this.date = null
+      this.customerStreet = null;
+      this.customerBarangay = null;
+      this.customerProvince = null;
+      this.customerName = null;
+      this.contactNumber = null;
+      this.orderQuantity = null;
+      this.jarQuantity = "0";
+      this.tabQuantity = "0";
+      this.date = null;
     },
 
     placeOrder() {
@@ -280,7 +273,7 @@ export default {
       //if (this.jarQuantity=='0' && this.tabQuantity=='0' ){
       //       setTimeout(() => {
       //   this.$vloading.hide()
-      //    }, 1000) 
+      //    }, 1000)
       //    Swal.fire({
       //   position: "center",
       //   icon: "warning",
@@ -298,98 +291,103 @@ export default {
       //     timer: 1500
       //   });
       // }
-       if(this.customerName == null ||
-      this.contactNumber == null){
-          this.$v.$touch();
-           this.$vloading.hide()
-        
-      }
-      else{
-          this.totalPay =
-          this.jarQuantity * this.jarPrice + this.tabQuantity * this.tubPrice
-      var place = this.customerStreet.concat(
-        " ",
-        this.customerBarangay,
-        " ",
-        this.customerCity,
-        " ",
-        this.customerProvince
-      );
-      axios
-        .get(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?limit=2&access_token=${
-            this.accessToken
-          }`
-        )
-        .then(response => {
-          let res = JSON.stringify(response.data);
-          let result = JSON.parse(res); 
+      if (this.customerName == null || this.contactNumber == null) {
+        this.$v.$touch();
+        this.$vloading.hide();
+      } else {
+        this.totalPay =
+          this.jarQuantity * this.jarPrice + this.tabQuantity * this.tubPrice;
+        var place = this.customerStreet.concat(
+          " ",
+          this.customerBarangay,
+          " ",
+          this.customerCity,
+          " ",
+          this.customerProvince
+        );
+        axios
+          .get(
+            `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?limit=2&access_token=${
+              this.accessToken
+            }`
+          )
+          .then(response => {
+            let res = JSON.stringify(response.data);
+            let result = JSON.parse(res);
 
-          var from_place = turf.point([123.921969, 10.329892]);
-          var to_place = turf.point(result.features[0].geometry.coordinates);
-          var options = { units: "kilometers" };
-          var dist = turf.distance(from_place, to_place, options);
+            var from_place = turf.point([123.921969, 10.329892]);
+            var to_place = turf.point(result.features[0].geometry.coordinates);
+            var options = { units: "kilometers" };
+            var dist = turf.distance(from_place, to_place, options);
 
-          let param = {
-            //customer_id: localStorage.getItem("id"),
-            receiver_name: this.customerName,
-            order_id:Math.floor(Math.random() * 3000), 
-            building_street: this.customerStreet,
-            barangay: this.customerBarangay,
-            city_municipality: this.customerCity,
-            province: 6000,
-            contactNumber: this.contactNumber,
-            deliveryDate: this.date,
-            email:'Clark@gmail.com',
-            order_status:'completed',
-            payment_method:'COD',
-            payment_status:'completed',
-            landmark:this.landmark,
-            product_name:this.product_name,
-            product_quantity:this.product_quantity
-          };
-         
-          axios
-            .post(this.url+"/api/post/createWalkin", param,this.config)
-            .then(response => {
+            let param = {
+              //customer_id: localStorage.getItem("id"),
+              receiver_name: this.customerName,
+              order_id: Math.floor(Math.random() * 3000),
+              building_street: this.customerStreet,
+              barangay: this.customerBarangay,
+              city_municipality: this.customerCity,
+              province: 6000,
+              contactNumber: this.contactNumber,
+              deliveryDate: this.date,
+              email: "Clark@gmail.com",
+              order_status: "completed",
+              payment_method: "COD",
+              payment_status: "completed",
+              landmark: this.landmark,
+              order_items: this.anotherProduct
+              // product_name:this.product_name,
+              // product_quantity:this.product_quantity
+            };
+            console.log("-->>", param);
+
+            axios
+              .post(this.url + "/api/post/createWalkin", param, this.config)
+              .then(response => {
                 setTimeout(() => {
-                this.$vloading.hide()
-                },1000) 
-              if (response.data == "success") {
-                Swal.fire({
-                  position: "center",
-                  icon: "success",
-                  title: "Order saved",
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              this.showDialog();
-              }
-            });
-        });
-        } 
+                  this.$vloading.hide();
+                }, 1000);
+                if (response.data == "success") {
+                  Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Order saved",
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                  this.showDialog();
+                }
+              });
+          });
+      }
     },
-       getProduct(item){
-        this.$vloading.show();
-        axios.get(this.url+"/api/fetchProduct", this.config)
-        .then(response => {
-          var newArray = response.data.map( function( el ){ 
-                                return el.product_name; 
-                               });
-          this.availableProducts = newArray
+    getProduct(item) {
+      this.$vloading.show();
+      axios.get(this.url + "/api/fetchProduct", this.config).then(response => {
+        var newArray = response.data.map(function(el) {
+          return el.product_name;
         });
+        this.availableProducts = newArray;
+      });
     },
 
-    postOrder(){
-        axios.get(this.url+"/api/postPrice", this.config)
-        .then(response => {
-         console.log(response)
-         this.product_price = response
-         console.log(response)
-        });
+    addProduct() {
+      let prod = {
+        product_name: this.product_name,
+        product_quantity: this.product_quantity
+      };
+      this.anotherProduct.push(prod);
 
+      console.log(this.anotherProduct);
     },
-    
+    postOrder() {
+      axios.get(this.url + "/api/postPrice", this.config).then(response => {
+        console.log(response);
+        this.product_price = response;
+        console.log(response);
+      });
+    },
+
     isDisabled: function() {
       return !this.tabQuantity;
     },
@@ -397,38 +395,40 @@ export default {
     notLessDate(deliveredDate) {
       return deliveredDate >= new Date().toISOString().substr(0, 10);
     },
-    getHalayaTub(item){
-        this.$vloading.show();
-        axios.get(this.url+"/api/fetchHalayaTub", this.config)
+    getHalayaTub(item) {
+      this.$vloading.show();
+      axios
+        .get(this.url + "/api/fetchHalayaTub", this.config)
         .then(response => {
-            setTimeout(() => {
-        this.$vloading.hide()
-         },1000) 
+          setTimeout(() => {
+            this.$vloading.hide();
+          }, 1000);
           //this.tubName=response.data.product[0].product_name
           //this.tubPrice=response.data.product[0].product_price
         });
     },
 
-    getHalayaJar(item){
-        this.$vloading.show();
-        axios.get(this.url+"/api/fetchHalayaJar", this.config)
+    getHalayaJar(item) {
+      this.$vloading.show();
+      axios
+        .get(this.url + "/api/fetchHalayaJar", this.config)
         .then(response => {
-            setTimeout(() => {
-        this.$vloading.hide()
-         },1000) 
+          setTimeout(() => {
+            this.$vloading.hide();
+          }, 1000);
           //this.jarName=response.data.product[0].product_name
           //this.jarPrice=response.data.product[0].product_price
         });
     },
-     increaseJar: function() {
+    increaseJar: function() {
       this.jarQuantity++;
     },
-    decreaseJar:  function() {
-      if (this.jarQuantity==0){
-        this.jarQuantity=0
-      }else{
-      this.jarQuantity--;   
-}
+    decreaseJar: function() {
+      if (this.jarQuantity == 0) {
+        this.jarQuantity = 0;
+      } else {
+        this.jarQuantity--;
+      }
     },
     resetJar: function() {
       this.jarQuantity = 0;
@@ -436,18 +436,17 @@ export default {
     increaseTub: function() {
       this.tabQuantity++;
     },
-    decreaseTub:  function() {
-      if (this.tabQuantity==0){
-        this.tabQuantity=0
-      }else{
-      this.tabQuantity--;   
-}
+    decreaseTub: function() {
+      if (this.tabQuantity == 0) {
+        this.tabQuantity = 0;
+      } else {
+        this.tabQuantity--;
+      }
     },
 
     resetTub: function() {
       this.tabQuantity = 0;
-    },
-
+    }
   }
 };
 </script>

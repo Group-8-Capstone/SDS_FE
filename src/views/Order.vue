@@ -25,6 +25,32 @@
           </v-card-title>
 
           <!-- Order Detail Dialog -->
+          <div class="text-center">
+            <v-dialog v-model="orderItemDialog" width="500">
+              <v-card>
+                <v-simple-table v-for="i in line_items" :key="i.product_name">
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-left">{{i.product_name}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ i.pivot.order_quantity }}</td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" text @click="dialogClose()">Ok</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
 
           <v-row>
             <v-data-table :headers="headers" :items="orders" :search="search">
@@ -35,37 +61,11 @@
               <!-- <template v-slot:item.preferred_delivery_date="{ item }">
                 <span>{{new Date(item.preferred_delivery_date).toISOString().substring(0,10)}}</span>
               </template>-->
-              <template v-slot:item.line_items="{ item }">
-                <div class="text-center">
-                  <v-dialog v-model="dialog" width="500">
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
-                    </template>
-
-                    <v-card>
-                      <v-simple-table v-for="i in item.line_items" :key="i.product_name">
-                        <template v-slot:default>
-                          <thead>
-                            <tr>
-                              <th class="text-left">{{i.product_name}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>{{ item.order_quantity }}</td>
-                            </tr>
-                          </tbody>
-                        </template>
-                      </v-simple-table>
-                      <v-divider></v-divider>
-
-                      <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-                </div>
+              <template v-slot:item.products="{ item }">
+                <!-- <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-bind="attrs" v-on="on" @click="orderItemDialog === true">mdi-information</v-icon>
+                </template> -->
+                <v-icon @click="orderItemIcon(item.products)">mdi-information</v-icon>
               </template>
 
               <template v-slot:item.contact_number="{ item }">
@@ -81,7 +81,7 @@
                 <div v-if="isCanceled(item) === true">
                   <v-icon
                     disabled
-                    @click="editDialog = !editDialog, editItem(item) "
+                    @click="editDialog = !editDialog, editItem(item)"
                     class="mr-2"
                     normal
                     title="Edit"
@@ -343,6 +343,8 @@ export default {
       distance: 0,
       status: "On order",
       orderedProducts: [],
+      orderItemDialog: false,
+      line_items: [],
       msg: [],
       date2: new Date(),
       hover: false,
@@ -359,7 +361,6 @@ export default {
       orderQuantity: "",
       orderStatus: "On order",
       search: "",
-      dialog: false,
       disabled: true,
       orderDetailDialog: false,
       online_ordes: [],
@@ -374,7 +375,7 @@ export default {
         {
           text: "Order Item",
           sortable: false,
-          value: "line_items"
+          value: "products"
         },
         {
           text: "Total Payment",
@@ -400,7 +401,7 @@ export default {
           width: "270px"
         },
         { text: "Contact Number", value: "contact_number", sortable: false },
-        { text: "Distance", value: "distance" },
+        // { text: "Distance", value: "distance" },
         {
           text: "Mode of Payment",
           value: "payment_method",
@@ -454,7 +455,7 @@ export default {
     let channel = pusher.subscribe("order-channel");
 
     channel.bind("newOrder", data => {
-      console.log(data.order);
+      // console.log(data.order);
       // this.fetchOrders();
       this.fetchPendingOrders();
     });
@@ -508,7 +509,7 @@ export default {
       "Access-Control-Allow-Origin": "*"
     };
     this.config = config;
-    console.log("this.config", this.config);
+    // console.log("this.config", this.config);
   },
   created() {
     this.saveProducts();
@@ -518,6 +519,15 @@ export default {
     setInterval(this.fetchOrders(), 3000);
   },
   methods: {
+    orderItemIcon(line_items){
+      // console.log("order products: ", line_items)
+      this.line_items = line_items;
+      this.orderItemDialog = true;
+    },
+    dialogClose(){
+      this.orderItemDialog = false;
+      this.line_items = [];
+    },
     getColor(status) {
       if (status === "Cancelled") return "orange";
       else if (status === "On order") return "blue";
@@ -537,7 +547,7 @@ export default {
           }
         }
       }
-      console.log("orderedProducts: ", this.orderedProducts);
+      // console.log("orderedProducts: ", this.orderedProducts);
     },
     closeDialog() {
       this.orderDetails = false;
@@ -570,7 +580,7 @@ export default {
           " ",
           this.post.province
         );
-        console.log("this.post", this.post);
+        // console.log("this.post", this.post);
         axios
           .get(
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?limit=2&access_token=${
@@ -589,7 +599,7 @@ export default {
             axios
               .post(this.url + "/api/post/update", this.post, this.config)
               .then(response => {
-                console.log("resss: ", response.data);
+                // console.log("resss: ", response.data);
                 this.$vloading.hide();
                 Swal.fire({
                   title: "Successfully Updated",
@@ -747,7 +757,9 @@ export default {
               );
             this.orders[i]["customer_address"] = place;
             this.orders[i]["time"] = "1PM - 4PM";
+
           }
+          // console.log('++++++', this.orders)
         })
         .catch(error => {
           console.log("ERROR: ", error);
@@ -787,7 +799,7 @@ export default {
       axios
         .post(this.url + "/api/post/confirm/" + item.id, {}, this.config)
         .then(response => {
-          console.log(response.data);
+          // console.log(response.data);
           this.$vloading.hide();
           Swal.fire({
             title: "Order has been confirmed",
@@ -889,7 +901,7 @@ export default {
           .post(this.url + "/api/order-details", details, this.config)
           .then(response => {
             this.fetchOrders();
-            console.log("response for saving order details: ", response.data);
+            // console.log("response for saving order details: ", response.data);
           })
           .catch(error => {
             console.log("ERROR: ", error);
@@ -897,7 +909,7 @@ export default {
       }
     },
     saveOrder(param) {
-      console.log("hakdog", param);
+      // console.log("hakdog", param);
       axios
         .post(this.url + "/api/save-orders", param, this.config)
         .then(response => {
