@@ -145,6 +145,7 @@ export default {
       tabQuantity: "0",
       totalPay: 0,
       distance: 0,
+      disabled: true,
       contactRules: [
         v => !!v || "Phone number is required",
         v => /^(09|\+639)\d{9}$/.test(v) || "Input valid phone number"
@@ -248,8 +249,8 @@ export default {
   },
 
   created() {
-    this.getHalayaJar();
-    this.getHalayaTub();
+    // this.getHalayaJar();
+    // this.getHalayaTub();
     this.getProduct();
   },
 

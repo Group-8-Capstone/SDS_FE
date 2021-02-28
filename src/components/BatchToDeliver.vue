@@ -18,10 +18,10 @@
                     <v-card-title class="deep-purple lighten-5" id="title">{{item.barangay_name}}</v-card-title>
                     <hr>
                     <v-spacer/>
-                    <v-card-text id="qty">
+                    <!-- <v-card-text id="qty">
                       <b>Number of Batch:</b>
                       {{item.length}}
-                    </v-card-text>
+                    </v-card-text> -->
                     <v-btn
                       outlined
                       rounded
@@ -482,6 +482,7 @@ export default {
     //     }
     //   }
     // }
+
   }
 };
 </script>
