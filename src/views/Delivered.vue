@@ -21,11 +21,12 @@
                 <template v-slot:activator="{ on, attrs }">
               <div>-->
               <v-btn @click="isEmpty(deliveredOrder)" class="float-right" outlined color="purple">
-                <download-csv
+                <download-excel
                   class="btn btn-default"
                   :data="deliveredOrder"
-                  name="Delivered.csv"
-                >Export as CSV</download-csv>
+                  :fields="csvfields"
+                  name="Delivered.xls"
+                >Export Excel</download-excel>
               </v-btn>
               <!-- <v-btn
                       @click="isEmpty(deliveredOrder)"
@@ -57,13 +58,43 @@
         </v-row>
       </v-card>
     </div>
+
+    <!-- Order Detail Dialog -->
+    <div class="text-center">
+      <v-dialog v-model="orderItemDialog" width="500">
+        <v-card>
+          <v-simple-table v-for="i in line_items" :key="i.product_name">
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">{{i.product_name}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ i.pivot.order_quantity }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="dialogClose()">Ok</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
+
     <v-data-table :headers="headers" :items="deliveredOrder" :search="search">
       <template v-slot:item.preferred_delivery_date="{ item }">
         <span>{{new Date(item.preferred_delivery_date).toISOString().substring(0,10)}}</span>
       </template>
-      <template v-slot:item.line_items="{ item }">
-        <div class="text-center">
+      <!-- <template v-slot:item.line_items="{ item }"> -->
+      <!-- <div class="text-center">
           <v-dialog v-model="dialog" width="500">
+            
             <template v-slot:activator="{ on, attrs }">
               <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
             </template>
@@ -91,8 +122,11 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </div>
+      </div>-->
+      <template v-slot:item.products="{ item }">
+        <v-icon @click="orderItemIcon(item.products)">mdi-information</v-icon>
       </template>
+      <!-- </template> -->
       <template v-slot:item.order_status="{ item }">
         <v-chip color="green" text-color="white">{{ item.order_status }}</v-chip>
       </template>
@@ -103,11 +137,14 @@
 <script>
 import Vue from "vue";
 import JsonCSV from "vue-json-csv";
+import JsonExcel from "vue-json-excel";
 import DeliveredPdf from "./DeliveredPdf.vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-Vue.component("downloadCsv", JsonCSV);
+// Vue.component("downloadCsv", JsonCSV);
+Vue.component("downloadExcel", JsonExcel);
+
 export default {
   name: "Delivery",
   components: { DeliveredPdf },
@@ -117,6 +154,9 @@ export default {
       search: "",
       month: "",
       year: " ",
+      dialog: false,
+      orderItemDialog: false,
+      line_items: [],
       is_empty: false,
       months: [
         "All",
@@ -133,6 +173,27 @@ export default {
         "November",
         "December"
       ],
+      csvfields: {
+        "Receiver_Name": "receiver_name",
+        "Contact_Number": "contact_number",
+        "Email": "email",
+        "12Doz_Ube_Halaya_Jars_Desserts_Qty": "12 Doz Ube Halaya Jars Desserts qty",
+        "Ube_Quencher_Qty": "UBE Quencher qty",
+        "Ubechi_Qty": "Ubechi qty",
+        "Ube_Halaya_Square_Bottle_Qty": "Ubehalaya Square Bottle qty",
+        "Ubeporado": "Ubeporado qty",
+        "Total_Payment": "total_payment",
+        "Landmark": "landmark",
+        "Building_Or_Street": "building_or_street",
+        "Barangay": "barangay",
+        "City_Or_Municipality": "city_or_municipality",
+        "Province": "province",
+        "Preferred_Delivery_Date": "preferred_delivery_date",
+        "Order_Status": "order_status",
+        "Payment_Method": "payment_method",
+        "Payment_Status": "payment_status",
+        "Time": "time",
+      },
       headers: [
         {
           text: "Name",
@@ -144,7 +205,7 @@ export default {
         {
           text: "Order Item",
           sortable: false,
-          value: "line_items"
+          value: "products"
         },
         {
           text: "Total Payment",
@@ -199,6 +260,14 @@ export default {
     this.config = config;
   },
   methods: {
+    orderItemIcon(line_items) {
+      this.line_items = line_items;
+      this.orderItemDialog = true;
+    },
+    dialogClose() {
+      this.orderItemDialog = false;
+      this.line_items = [];
+    },
     //fetch all data
     loadDelivered() {
       this.$vloading.show();
@@ -208,26 +277,19 @@ export default {
           setTimeout(() => {
             this.$vloading.hide();
           }, 1000);
-          console.log("delivered: ", response.data);
           this.deliveredOrder = response.data;
-          for (var i = 0; i < this.deliveredOrder.length; i++) {
-            var street = response.data[i].building_or_street;
-            var barangay = response.data[i].barangay;
-            var city = response.data[i].city_or_municipality;
-            var province = response.data[i].province;
-            var place = street
-              .toString()
-              .concat(
-                " ",
-                barangay.toString(),
-                " ",
-                city.toString(),
-                " ",
-                province.toString()
-              );
-            this.deliveredOrder[i]["customer_address"] = place;
-            this.deliveredOrder[i]["time"] = "1PM - 4PM";
-          }
+            
+            this.deliveredOrder.forEach((order, index) => {
+            let { products } = order;
+            this.deliveredOrder[index]["time"] = "1PM - 4PM";
+            var name = "";
+            var qty = 0;
+            for (var i = 0; i < products.length; i++){
+              name = products[i].product_name;
+              qty = products[i].pivot.order_quantity;
+              this.deliveredOrder[index][name + " qty"] = products[i].pivot.order_quantity;
+            }
+          });
         });
     },
 
@@ -293,12 +355,30 @@ export default {
             this.config
           )
           .then(response => {
-            if (response.data.data.length == 0) {
+            if (response.data.length == 0) {
               this.is_empty = true;
-              this.deliveredOrder = response.data.data;
+              this.deliveredOrder = response.data;
             } else {
               this.is_empty = false;
-              this.deliveredOrder = response.data.data;
+              this.deliveredOrder = response.data;
+              for (var i = 0; i < this.deliveredOrder.length; i++) {
+                var street = response.data[i].building_or_street;
+                var barangay = response.data[i].barangay;
+                var city = response.data[i].city_or_municipality;
+                var province = response.data[i].province;
+                var place = street
+                  .toString()
+                  .concat(
+                    " ",
+                    barangay.toString(),
+                    " ",
+                    city.toString(),
+                    " ",
+                    province.toString()
+                  );
+                this.deliveredOrder[i]["customer_address"] = place;
+                this.deliveredOrder[i]["time"] = "1PM - 4PM";
+              }
             }
           });
       }

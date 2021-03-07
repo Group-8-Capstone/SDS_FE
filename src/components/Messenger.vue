@@ -632,11 +632,11 @@ export default {
             // product_name: this.product_name,
             // product_quantity: this.product_quantity
           };
-          console.log("----", param);
+          // console.log("----", param);
           axios
             .post(this.url + "/api/post/createOrder", param, this.config)
             .then(response => {
-              console.log(">>>", response.data);
+              // console.log(">>>", response.data);
               setTimeout(() => {
                 this.$vloading.hide();
               }, 1000);

@@ -180,7 +180,7 @@ export default {
              setTimeout(() => {
             this.$vloading.hide()
           },1000) 
-            this.$router.push('/dashboard');
+            this.$router.push('/order');
           } else if (response.data.UserAccount[0].role == 'customer') {
             // this.loading = false;
              setTimeout(() => {

@@ -271,27 +271,6 @@ export default {
 
     placeOrder() {
       this.$vloading.show();
-      //if (this.jarQuantity=='0' && this.tabQuantity=='0' ){
-      //       setTimeout(() => {
-      //   this.$vloading.hide()
-      //    }, 1000)
-      //    Swal.fire({
-      //   position: "center",
-      //   icon: "warning",
-      //   title: "No order",
-      //   showConfirmButton: false,
-      //   timer: 1500
-      // });
-      // } else if(this.jarQuantity <0 ||this.tabQuantity <0){
-      //   this.$vloading.hide()
-      //   Swal.fire({
-      //     position: "center",
-      //     icon: "warning",
-      //     title: "Your quantity must not be less than 0",
-      //     showConfirmButton: false,
-      //     timer: 1500
-      //   });
-      // }
       if (this.customerName == null || this.contactNumber == null) {
         this.$v.$touch();
         this.$vloading.hide();
@@ -332,7 +311,7 @@ export default {
               contactNumber: this.contactNumber,
               deliveryDate: this.date,
               email: "Clark@gmail.com",
-              order_status: "completed",
+              order_status: "Delivered",
               payment_method: "COD",
               payment_status: "completed",
               landmark: this.landmark,
@@ -340,7 +319,6 @@ export default {
               // product_name:this.product_name,
               // product_quantity:this.product_quantity
             };
-            console.log("-->>", param);
 
             axios
               .post(this.url + "/api/post/createWalkin", param, this.config)
@@ -379,13 +357,10 @@ export default {
       };
       this.anotherProduct.push(prod);
 
-      console.log(this.anotherProduct);
     },
     postOrder() {
       axios.get(this.url + "/api/postPrice", this.config).then(response => {
-        console.log(response);
         this.product_price = response;
-        console.log(response);
       });
     },
 

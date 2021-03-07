@@ -455,7 +455,6 @@ export default {
     let channel = pusher.subscribe("order-channel");
 
     channel.bind("newOrder", data => {
-      // console.log(data.order);
       // this.fetchOrders();
       this.fetchPendingOrders();
     });
@@ -509,7 +508,6 @@ export default {
       "Access-Control-Allow-Origin": "*"
     };
     this.config = config;
-    // console.log("this.config", this.config);
   },
   created() {
     this.saveProducts();
@@ -520,7 +518,6 @@ export default {
   },
   methods: {
     orderItemIcon(line_items){
-      // console.log("order products: ", line_items)
       this.line_items = line_items;
       this.orderItemDialog = true;
     },
@@ -547,7 +544,6 @@ export default {
           }
         }
       }
-      // console.log("orderedProducts: ", this.orderedProducts);
     },
     closeDialog() {
       this.orderDetails = false;
@@ -580,7 +576,6 @@ export default {
           " ",
           this.post.province
         );
-        // console.log("this.post", this.post);
         axios
           .get(
             `https://api.mapbox.com/geocoding/v5/mapbox.places/${place}.json?limit=2&access_token=${
@@ -599,14 +594,12 @@ export default {
             axios
               .post(this.url + "/api/post/update", this.post, this.config)
               .then(response => {
-                // console.log("resss: ", response.data);
                 this.$vloading.hide();
                 Swal.fire({
                   title: "Successfully Updated",
                   icon: "success",
                   timer: 3000
                 }),
-                  // this.getOrders();
                   this.fetchOrders();
               });
           });
@@ -759,7 +752,6 @@ export default {
             this.orders[i]["time"] = "1PM - 4PM";
 
           }
-          // console.log('++++++', this.orders)
         })
         .catch(error => {
           console.log("ERROR: ", error);
@@ -791,7 +783,6 @@ export default {
               );
             this.pendingOrders[i]["customer_address"] = place;
           }
-          // console.log("ordersssssss: ", this.orders);
         });
     },
     confirmOrder(item) {
@@ -799,7 +790,6 @@ export default {
       axios
         .post(this.url + "/api/post/confirm/" + item.id, {}, this.config)
         .then(response => {
-          // console.log(response.data);
           this.$vloading.hide();
           Swal.fire({
             title: "Order has been confirmed",
@@ -849,8 +839,6 @@ export default {
           "https://wawens.tamarindph.com/wp-json/wc/v2/orders?consumer_key=ck_d6fbb57e19291fe40e1acea63eea4139e457539b&consumer_secret=cs_a2b591bddfb2c5ce4fdacb21d0cdac17e2a7e7b9"
         )
         .then(response => {
-          // var data = response.data;
-          // console.log("this.orders>>: ", response.data);
           for (var i = 0; i < response.data.length; i++) {
             var customer_details = response.data[i].billing;
             var delivery_date = "";
@@ -881,8 +869,6 @@ export default {
               payment_method: ORDER.payment_method,
               payment_status: ORDER.status
             };
-          
-          // data[i]['preferred_delivery_date'] = delivery_date
 
           this.saveOrder(data);
           this.saveOrderDetails(order_details, orderID);
@@ -901,7 +887,6 @@ export default {
           .post(this.url + "/api/order-details", details, this.config)
           .then(response => {
             this.fetchOrders();
-            // console.log("response for saving order details: ", response.data);
           })
           .catch(error => {
             console.log("ERROR: ", error);
@@ -909,12 +894,10 @@ export default {
       }
     },
     saveOrder(param) {
-      // console.log("hakdog", param);
       axios
         .post(this.url + "/api/save-orders", param, this.config)
         .then(response => {
           this.fetchOrders();
-          console.log("response for saving orders: ", response.data);
         })
         .catch(error => {
           console.log("ERROR: ", error);

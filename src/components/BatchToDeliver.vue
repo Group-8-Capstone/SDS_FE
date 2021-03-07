@@ -52,7 +52,7 @@
                     <v-chip :color="getColor(item.order_status)" dark>{{ item.order_status }}</v-chip>
                   </template>
                   <template v-slot:item.action="{ item }">
-                    <div v-if="isAdmin() === true">
+                    <!-- <div v-if="isAdmin() === true">
                       <div v-if="isCanceled(item) === true || isDelivered(item) === true">
                         <v-icon
                           disabled
@@ -84,8 +84,8 @@
                           title="Cancel"
                         >mdi-cancel</v-icon>
                       </div>
-                    </div>
-                    <div v-if="isRider() === true">
+                    </div> -->
+                    <div>
                       <div v-if="isCanceled(item) === true || isDelivered(item) === true">
                         <v-icon
                           disabled
@@ -110,7 +110,6 @@
                           @click="alertDelivered(item)"
                         >mdi-truck-check-outline</v-icon>
                         <v-icon
-                          disabled
                           @click="alertCancel(item)"
                           normal
                           class="mr-2"
@@ -333,7 +332,7 @@ export default {
 
   methods: {
     getColor(status) {
-      if (status === "Canceled") return "orange";
+      if (status === "Cancelled") return "orange";
       else if (status === "On order") return "blue";
       else return "green";
     },
@@ -429,8 +428,8 @@ export default {
         )
         .then(response => {
           Swal.fire({
-            title: "Canceled!",
-            text: "Order has been canceled",
+            title: "Cancelled!",
+            text: "Order has been cancelled",
             icon: "success",
             showConfirmButton: false,
             timer: 1500
@@ -550,7 +549,7 @@ export default {
       }
     },
     isCanceled(item) {
-      if (item.order_status == "Canceled") {
+      if (item.order_status == "Cancelled") {
         return true;
       }
     },
@@ -563,7 +562,7 @@ export default {
       for (var i = 0; i < item.orders.length; i++) {
         if (
           item.orders[i].order_status === "On order" ||
-          item.orders[i].order_status === "Canceled"
+          item.orders[i].order_status === "Cancelled"
         ) {
           return false;
         } else {
