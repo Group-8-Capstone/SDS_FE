@@ -28,12 +28,41 @@
                       color="purple"
                       v-bind="attrs"
                       v-on="on"
-                      @click="viewOrders(item.orders)"
+                      @click="viewOrders(item)"
                     >View Orders</v-btn>
                   </v-card>
                 </v-col>
               </v-row>
             </template>
+
+           <!-- Order Detail Dialog -->
+          <div class="text-center">
+            <v-dialog v-model="orderItemDialog" width="500">
+              <v-card>
+                <v-simple-table v-for="i in line_items" :key="i.product_name">
+                  <template v-slot:default>
+                    <thead>
+                      <tr>
+                        <th class="text-left">{{i.product_name}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ i.pivot.order_quantity }}</td>
+                      </tr>
+                    </tbody>
+                  </template>
+                </v-simple-table>
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" text @click="dialogClose()">Ok</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+
             <v-card>
               <v-toolbar dark color="purple">
                 <v-btn icon dark @click="dialog = false">
@@ -48,6 +77,11 @@
               <v-divider></v-divider>
               <template>
                 <v-data-table :headers="headers" :items="orders" class="elevation-1">
+
+                  <template v-slot:item.products="{ item }">
+                    <v-icon @click="orderItemIcon(item.products)">mdi-information</v-icon>
+                  </template>
+
                   <template v-slot:item.order_status="{ item }">
                     <v-chip :color="getColor(item.order_status)" dark>{{ item.order_status }}</v-chip>
                   </template>
@@ -273,14 +307,16 @@ export default {
       notifications: false,
       sound: true,
       widgets: false,
-      brgy_name:null,
+      brgy_name: null,
       orders: [],
       allOrders: [],
       barangay_name: "",
       delivery_batch: [],
+      line_items: [],
       deliveries: [],
       deliveriesByBrngy: {},
-      deliveriesGroup:[],
+      deliveriesGroup: [],
+      orderItemDialog: false,
       headers: [
         {
           text: "Receiver Name: ",
@@ -288,12 +324,17 @@ export default {
           sortable: false,
           value: "receiver_name"
         },
+        {
+          text: "Order Item",
+          sortable: false,
+          value: "products"
+        },
         { text: "Address", value: "customer_address", sortable: false },
         { text: "Mobile Number", value: "contact_number", sortable: false },
-        { text: "Distance", value: "distance" },
-        { text: "Ube Halaya Tub Order Qty", value: "ubehalayatub_qty" },
-        { text: "Ube Halaya Jar Order Qty", value: "ubehalayajar_qty" },
         ,
+        // { text: "Distance", value: "distance" },
+        // { text: "Ube Halaya Tub Order Qty", value: "ubehalayatub_qty" },
+        // { text: "Ube Halaya Jar Order Qty", value: "ubehalayajar_qty" },
         {
           text: "Total Item",
           value: "total_item",
@@ -327,20 +368,65 @@ export default {
     });
   },
   created() {
+    // this.fetchOrders();
     this.dataGrouping();
     setInterval(this.dataGrouping(), 3000);
   },
 
   methods: {
+    orderItemIcon(line_items) {
+      console.log("testoing: ", line_items);
+      this.line_items = line_items;
+      this.orderItemDialog = true;
+    },
+    dialogClose() {
+      this.orderItemDialog = false;
+      this.line_items = [];
+    },
     getColor(status) {
       if (status === "Canceled") return "orange";
       else if (status === "On order") return "blue";
       else return "green";
     },
+    // fetchOrders() {
+    //   this.$vloading.show();
+
+    //   axios
+    //     .get(this.url + "/api/orders", this.config)
+    //     .then(response => {
+    //       setTimeout(() => {
+    //         this.$vloading.hide();
+    //       }, 1000);
+
+    //       this.orders = response.data;
+    //       for (var i = 0; i < this.orders.length; i++) {
+    //         var street = response.data[i].building_or_street;
+    //         var barangay = response.data[i].barangay;
+    //         var city = response.data[i].city_or_municipality;
+    //         var province = response.data[i].province;
+    //         var place = street
+    //           .toString()
+    //           .concat(
+    //             " ",
+    //             barangay.toString(),
+    //             " ",
+    //             city.toString(),
+    //             " ",
+    //             province.toString()
+    //           );
+    //         this.orders[i]["customer_address"] = place;
+    //         this.orders[i]["time"] = "1PM - 4PM";
+    //       }
+    //       // console.log("++++++", this.orders);
+    //     })
+    //     .catch(error => {
+    //       console.log("ERROR: ", error);
+    //     });
+    // },
     viewOrders(item) {
       // console.log('grrrr: ', this.deliveriesGroup);
-      console.log("item: ", item);
-      this.orders = item;
+      console.log("item: ", item.orders);
+      this.orders = item.orders;
       this.barangay_name = item.barangay_name;
       this.dialog = true;
       this.dataGrouping();
@@ -454,7 +540,6 @@ export default {
           // this.barangay_array = Object.entries(templist); //array cotaining data nga gi group by barangay
           // console.log("Barangay Array: ", JSON.stringify(this.barangay_array[2][1][0]));
 
-
           // console.log("====", result)
           var mother_array = [];
           var deliveriesByBrngy = [];
@@ -482,16 +567,18 @@ export default {
           for (const city_mun in groupByMunicipality) {
             for (const byBrgy in groupByMunicipality[city_mun]) {
               var brgy_city_name = byBrgy + ", " + city_mun;
-              deliveriesByBrngy['brgy_name'] = brgy_city_name;
-              deliveriesByBrngy['length'] = groupByMunicipality[city_mun][byBrgy].length;
-              deliveriesByBrngy['orders'] = groupByMunicipality[city_mun][byBrgy];
+              deliveriesByBrngy["brgy_name"] = brgy_city_name;
+              deliveriesByBrngy["length"] =
+                groupByMunicipality[city_mun][byBrgy].length;
+              deliveriesByBrngy["orders"] =
+                groupByMunicipality[city_mun][byBrgy];
               mother_array.push(deliveriesByBrngy);
               deliveriesByBrngy = [];
             }
           }
 
           // this.deliveriesGroup = deliveriesByBrngy
-          
+
           this.deliveriesGroup = mother_array;
           // console.log('brgy',this.deliveriesGroup[0])
 
@@ -579,7 +666,6 @@ export default {
     //     }
     //   }
     // }
-
   }
 };
 </script>
