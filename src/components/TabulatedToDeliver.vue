@@ -9,10 +9,10 @@
               <!-- <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">-->
               <!-- <div> -->
-              <v-btn @click="isEmpty(deliveredOrder)" class="float-right" outlined color="purple">
+              <v-btn @click="isEmpty(todelivered)" class="float-right" outlined color="purple">
                 <download-csv
                   class="btn btn-default"
-                  :data="deliveredOrder"
+                  :data="todelivered"
                   name="Delivered.csv"
                 >Export as CSV</download-csv>
               </v-btn>

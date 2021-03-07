@@ -6,7 +6,7 @@
           <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
             <template v-slot:activator="{ on, attrs }">
               <v-row>
-                <v-col id="batchCards" v-for="(item, i) in deliveriesByBrngy" :key="i">
+                <v-col id="batchCards" v-for="(item, i) in deliveriesGroup" :key="i">
                   <v-card
                     id="cards"
                     class="text-center"
@@ -20,7 +20,7 @@
                     <v-spacer/>
                     <v-card-text id="qty">
                       <b>Number of Orders:</b>
-                      {{item}}
+                      {{item.length}}
                     </v-card-text>
                     <v-btn
                       outlined
@@ -28,7 +28,7 @@
                       color="purple"
                       v-bind="attrs"
                       v-on="on"
-                      @click="viewOrders(item)"
+                      @click="viewOrders(item.orders)"
                     >View Orders</v-btn>
                   </v-card>
                 </v-col>
@@ -273,12 +273,14 @@ export default {
       notifications: false,
       sound: true,
       widgets: false,
+      brgy_name:null,
       orders: [],
       allOrders: [],
       barangay_name: "",
       delivery_batch: [],
       deliveries: [],
       deliveriesByBrngy: {},
+      deliveriesGroup:[],
       headers: [
         {
           text: "Receiver Name: ",
@@ -336,6 +338,7 @@ export default {
       else return "green";
     },
     viewOrders(item) {
+      // console.log('grrrr: ', this.deliveriesGroup);
       console.log("item: ", item);
       this.orders = item;
       this.barangay_name = item.barangay_name;
@@ -446,8 +449,16 @@ export default {
             this.$vloading.hide();
           }, 1000);
           var result = response.data;
+
+          // var templist = this.$_.groupBy(result, "barangay");
+          // this.barangay_array = Object.entries(templist); //array cotaining data nga gi group by barangay
+          // console.log("Barangay Array: ", JSON.stringify(this.barangay_array[2][1][0]));
+
+
           // console.log("====", result)
-          let groupByMunicipality = {};
+          var mother_array = [];
+          var deliveriesByBrngy = [];
+          let groupByMunicipality = [];
           // let groupedOrders = {};
           result.forEach(municipyo => {
             let { city_or_municipality } = municipyo;
@@ -471,13 +482,18 @@ export default {
           for (const city_mun in groupByMunicipality) {
             for (const byBrgy in groupByMunicipality[city_mun]) {
               var brgy_city_name = byBrgy + ", " + city_mun;
-              this.deliveriesByBrngy['brgy_name'] = brgy_city_name;
-              this.deliveriesByBrngy['length'] = groupByMunicipality[city_mun][byBrgy].length;
-              this.deliveriesByBrngy['orders'] = groupByMunicipality[city_mun][byBrgy];
+              deliveriesByBrngy['brgy_name'] = brgy_city_name;
+              deliveriesByBrngy['length'] = groupByMunicipality[city_mun][byBrgy].length;
+              deliveriesByBrngy['orders'] = groupByMunicipality[city_mun][byBrgy];
+              mother_array.push(deliveriesByBrngy);
+              deliveriesByBrngy = [];
             }
           }
 
-          console.log("----", this.deliveriesByBrngy.toArray())
+          // this.deliveriesGroup = deliveriesByBrngy
+          
+          this.deliveriesGroup = mother_array;
+          // console.log('brgy',this.deliveriesGroup[0])
 
           // let deliveries = {};
           // const MAX_QUANTITY = 96;
