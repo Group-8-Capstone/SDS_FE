@@ -90,68 +90,6 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-            <!-- <v-row class="mx-2">
-              
-              <v-col cols="4">
-                <v-select
-                  label="Product Name"
-                  
-                  v-model="product_name"
-                  :items="items"
-                ></v-select>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                type="number"
-                  v-model="product_price"
-                  label="Product Price"
-                  v-bind:disabled="disabled"
-                ></v-text-field>
-              </v-col>
-              <v-col cols='4'>
-                <v-text-field
-                  label="Quantity"
-                  color="purple"
-                  type="number"
-                  v-model="product_quantity"
-                ></v-text-field>
-              </v-col>
-            </v-row>-->
-
-            <!-- <v-row align="center" justify="center">
-            <v-col cols="6">
-              <v-img width="300px" height="200px" src="../assets/halayaJar.jpg"></v-img>
-              <h6 class="text-center font-weight-light orange--text text-h6 [1] text-sm-h5 [1] text-md-h4 [1] text-lg-h4 [1] text-xl-h3[1] text-truncate">{{jarName}}</h6>
-              <div id="price" class=" text-center font-weight-light grey--text title">{{jarPrice}}</div>
-            </v-col>
-            <v-col cols="6">
-              <v-img width="300px" height="200px" src="../assets/halayaTab.jpg"></v-img>
-              <h6 class="text-center font-weight-light orange--text text-h6 [1] text-sm-h5 [1] text-md-h4 [1] text-lg-h4 [1] text-xl-h3[1] text-truncate">{{tubName}}</h6>
-              <div id="price" class="text-center font-weight-light grey--text title">{{tubPrice}}</div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6">
-              <v-text-field min=0 type="number" label="Quantity" v-model="jarQuantity">
-                <template slot="prepend">
-                  <div id="vue-counter">
-                    <v-icon type="button" v-on:click="increaseJar">mdi-plus</v-icon>
-                    <v-icon type="button" v-on:click="decreaseJar">mdi-minus</v-icon>
-                  </div>
-                </template>
-              </v-text-field>
-            </v-col>
-            <v-col cols="6">
-              <v-text-field min=0 type="number" label="Quantity" v-model="tabQuantity">
-                <template slot="prepend">
-                  <div id="vue-counter">
-                    <v-icon type="button" v-on:click="increaseTub">mdi-plus</v-icon>
-                    <v-icon type="button" v-on:click="decreaseTub">mdi-minus</v-icon>
-                  </div>
-                </template>
-              </v-text-field>
-            </v-col>
-            </v-row>-->
             <v-row>
               <v-col cols="6">
                 <v-select label="Product Name" v-model="product_name" :items="availableProducts"></v-select>
@@ -204,94 +142,6 @@
         </v-card-actions>
       </v-card>
     </v-form>
-    <!-- <template>
-      <v-dialog v-model="addCardDialog" width="500px">
-        <v-card>
-          <v-card-title class="align-center">
-            <v-list-item-title
-              class="d-flex align-center justify-center mx-auto headline black--text"
-            >SUMMARY OF ORDER</v-list-item-title>
-          </v-card-title>
-          <v-row class="pl-5">
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Receiver's Name:</h4>
-                {{customerName}}
-              </span>
-            </v-col>
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Receiver's Number:</h4>
-                {{contactNumber}}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row class="pl-5">
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Address:</h4>
-                {{customerStreet}}, {{customerBarangay}}, {{customerMunicipality}}
-              </span>
-            </v-col>
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Delivery:</h4>
-                {{date}}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row class="pl-5">
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Product:</h4>
-                {{product_name}}
-              </span>
-            </v-col>
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Product Quantity:</h4>
-                {{product_quantity}}
-              </span>
-            </v-col>
-          </v-row>
-          <v-row class="pl-5">
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Product Price:</h4>
-                {{product_price}}
-              </span>
-            </v-col>
-            <v-col md="6" lg="6" sm="12">
-              <span>
-                <h4>Your Total Payment:</h4>
-                {{totalPay}} + delivery fee
-              </span>
-            </v-col>
-            <p style="font-size: 15px;">
-              <i>*Note: Delivery fee will be determined after an order confirmation call and delivery charges may vary for different locations.</i>
-            </p>
-            <v-col cols="6"></v-col>
-          </v-row>
-          <v-card-actions v-show="isSubmit === true">
-            <v-spacer></v-spacer>
-            <v-btn
-              class="ma-3"
-              color="orange"
-              outlined
-              @click="addCardDialog=false , addOrderDialog=true"
-            >CANCEL</v-btn>
-            <v-btn class="ma-3" color="purple darken-2" outlined @click="placeOrder()">PLACE ORDER</v-btn>
-          </v-card-actions>
-          <v-progress-linear
-            color="deep-purple accent-4"
-            v-show="loading"
-            indeterminate
-            rounded
-            height="6"
-          ></v-progress-linear>
-        </v-card>
-      </v-dialog>
-    </template>-->
   </div>
 </template>
 <style scoped>
@@ -494,7 +344,6 @@ export default {
       this.customerStreet = null;
       this.customerBarangay = null;
       this.customerMunicipality = null;
-      // this.customerProvince = null;
       this.customerName = null;
       this.contactNumber = null;
       this.jarQuantity = 0;
@@ -505,6 +354,7 @@ export default {
     getProduct(item) {
       this.$vloading.show();
       axios.get(this.url + "/api/fetchProduct", this.config).then(response => {
+        this.$vloading.hide();
         var newArray = response.data.map(function(el) {
           return el.product_name;
         });

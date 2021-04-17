@@ -36,40 +36,6 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-            <!-- <v-row>
-             <v-col cols="6" class="pl-5" >
-              <v-img  width="250px" height="200px" src="../assets/halayaJar.jpg"></v-img>
-              <h6 class="display-1 font-weight-light orange--text ml-5">{{jarName}}</h6>
-              <div id="price" class="font-weight-light grey--text title ml-5">{{jarPrice}}</div>
-            </v-col>
-            <v-col cols="6" class="pl-5" >
-              <v-img  width="250px" height="200px" src="../assets/halayaTab.jpg"></v-img>
-               <h6 class="display-1 font-weight-light orange--text ">{{tubName}}</h6>
-                <div id="price" class="font-weight-light grey--text title ">{{tubPrice}}</div>
-            </v-col>
-            </v-row>-->
-            <!-- <v-row >
-            <v-col cols="6" >
-              <v-text-field min="0" type="number" label="Quantity" v-model="jarQuantity">
-                <template slot="prepend">
-                  <div id="vue-counter">
-              <v-icon type="button" v-on:click="increaseJar">mdi-plus</v-icon> 
-                <v-icon type="button" v-on:click="decreaseJar" >mdi-minus</v-icon>
-              </div>
-                </template>
-              </v-text-field>
-            </v-col>
-            <v-col  cols="6" class="pl-12">
-               <v-text-field min="0" type="number" label="Quantity" v-model="tabQuantity">
-                <template slot="prepend">
-                  <div id="vue-counter" >
-              <v-icon type="button" v-on:click="increaseTub">mdi-plus</v-icon>
-              <v-icon type="button" v-on:click="decreaseTub" disabled:isDisabled class="ml-1">mdi-minus</v-icon>
-              </div>
-                </template>
-              </v-text-field>
-            </v-col>
-            </v-row>-->
             <v-row>
               <v-col cols="6">
                 <v-select label="Product Name" v-model="product_name" :items="availableProducts"></v-select>
@@ -249,8 +215,6 @@ export default {
   },
 
   created() {
-    // this.getHalayaJar();
-    // this.getHalayaTub();
     this.getProduct();
   },
 
@@ -301,7 +265,6 @@ export default {
             var dist = turf.distance(from_place, to_place, options);
 
             let param = {
-              //customer_id: localStorage.getItem("id"),
               receiver_name: this.customerName,
               order_id: Math.floor(Math.random() * 3000),
               building_street: this.customerStreet,
@@ -316,8 +279,6 @@ export default {
               payment_status: "completed",
               landmark: this.landmark,
               order_items: this.anotherProduct
-              // product_name:this.product_name,
-              // product_quantity:this.product_quantity
             };
 
             axios
@@ -343,6 +304,7 @@ export default {
     getProduct(item) {
       this.$vloading.show();
       axios.get(this.url + "/api/fetchProduct", this.config).then(response => {
+        this.$vloading.hide();
         var newArray = response.data.map(function(el) {
           return el.product_name;
         });
@@ -371,31 +333,31 @@ export default {
     notLessDate(deliveredDate) {
       return deliveredDate >= new Date().toISOString().substr(0, 10);
     },
-    getHalayaTub(item) {
-      this.$vloading.show();
-      axios
-        .get(this.url + "/api/fetchHalayaTub", this.config)
-        .then(response => {
-          setTimeout(() => {
-            this.$vloading.hide();
-          }, 1000);
-          //this.tubName=response.data.product[0].product_name
-          //this.tubPrice=response.data.product[0].product_price
-        });
-    },
+    // getHalayaTub(item) {
+    //   this.$vloading.show();
+    //   axios
+    //     .get(this.url + "/api/fetchHalayaTub", this.config)
+    //     .then(response => {
+    //       setTimeout(() => {
+    //         this.$vloading.hide();
+    //       }, 1000);
+    //       //this.tubName=response.data.product[0].product_name
+    //       //this.tubPrice=response.data.product[0].product_price
+    //     });
+    // },
 
-    getHalayaJar(item) {
-      this.$vloading.show();
-      axios
-        .get(this.url + "/api/fetchHalayaJar", this.config)
-        .then(response => {
-          setTimeout(() => {
-            this.$vloading.hide();
-          }, 1000);
-          //this.jarName=response.data.product[0].product_name
-          //this.jarPrice=response.data.product[0].product_price
-        });
-    },
+    // getHalayaJar(item) {
+    //   this.$vloading.show();
+    //   axios
+    //     .get(this.url + "/api/fetchHalayaJar", this.config)
+    //     .then(response => {
+    //       setTimeout(() => {
+    //         this.$vloading.hide();
+    //       }, 1000);
+    //       //this.jarName=response.data.product[0].product_name
+    //       //this.jarPrice=response.data.product[0].product_price
+    //     });
+    // },
     increaseJar: function() {
       this.jarQuantity++;
     },

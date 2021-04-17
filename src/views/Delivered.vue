@@ -17,9 +17,6 @@
           <v-spacer></v-spacer>
           <v-col cols="2">
             <div>
-              <!-- <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-              <div>-->
               <v-btn @click="isEmpty(deliveredOrder)" class="float-right" outlined color="purple">
                 <download-excel
                   class="btn btn-default"
@@ -28,31 +25,6 @@
                   name="Delivered.xls"
                 >Export Excel</download-excel>
               </v-btn>
-              <!-- <v-btn
-                      @click="isEmpty(deliveredOrder)"
-                      class="float-right"
-                      outlined
-                      color="purple"
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      <v-icon>mdi-download</v-icon>Export
-              </v-btn>-->
-              <!-- </div>
-              </template>-->
-              <!-- <v-list v-show="is_empty === false">
-                  <v-col>
-                    <DeliveredPdf :headers="headers" :deliveredOrder="deliveredOrder"></DeliveredPdf>
-                    <div>
-                      <download-csv
-                        class="btn btn-default pa-2"
-                        :data="deliveredOrder"
-                        name="Delivered.csv"
-                      >Export as CSV</download-csv>
-                    </div>
-                  </v-col>
-              </v-list>-->
-              <!-- </v-menu> -->
             </div>
           </v-col>
         </v-row>
@@ -91,42 +63,10 @@
       <template v-slot:item.preferred_delivery_date="{ item }">
         <span>{{new Date(item.preferred_delivery_date).toISOString().substring(0,10)}}</span>
       </template>
-      <!-- <template v-slot:item.line_items="{ item }"> -->
-      <!-- <div class="text-center">
-          <v-dialog v-model="dialog" width="500">
-            
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon v-bind="attrs" v-on="on">mdi-information</v-icon>
-            </template>
-
-            <v-card>
-              <v-simple-table v-for="i in item.line_items" :key="i.product_name">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="text-left">{{i.product_name}}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{{ item.order_quantity }}</td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-              <v-divider></v-divider>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="dialog = false">Ok</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-      </div>-->
+     
       <template v-slot:item.products="{ item }">
         <v-icon @click="orderItemIcon(item.products)">mdi-information</v-icon>
       </template>
-      <!-- </template> -->
       <template v-slot:item.order_status="{ item }">
         <v-chip color="green" text-color="white">{{ item.order_status }}</v-chip>
       </template>
@@ -142,7 +82,6 @@ import DeliveredPdf from "./DeliveredPdf.vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-// Vue.component("downloadCsv", JsonCSV);
 Vue.component("downloadExcel", JsonExcel);
 
 export default {
@@ -280,7 +219,11 @@ export default {
           this.deliveredOrder = response.data;
             
             this.deliveredOrder.forEach((order, index) => {
-            let { products } = order;
+            let { products, building_or_street, barangay, city_or_municipality, province, } = order;
+            var place = building_or_street
+              .toString()
+              .concat(" ", barangay, " ", city_or_municipality, " ", province);
+            this.deliveredOrder[index]["customer_address"] = place;
             this.deliveredOrder[index]["time"] = "1PM - 4PM";
             var name = "";
             var qty = 0;

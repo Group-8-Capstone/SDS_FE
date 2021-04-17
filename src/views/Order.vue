@@ -833,76 +833,97 @@ export default {
         });
     },
 
+    // saveOrders() {
+    //   axios
+    //     .get(
+    //       "https://wawens.tamarindph.com/wp-json/wc/v2/orders?consumer_key=ck_d6fbb57e19291fe40e1acea63eea4139e457539b&consumer_secret=cs_a2b591bddfb2c5ce4fdacb21d0cdac17e2a7e7b9"
+    //     )
+    //     .then(response => {
+    //       for (var i = 0; i < response.data.length; i++) {
+    //         var customer_details = response.data[i].billing;
+    //         var delivery_date = "";
+    //         var orderID = response.data[i].id;
+    //         var meta_data = response.data[i].meta_data;
+    //         var order_details = response.data[i].line_items;
+    //         var ORDER = response.data[i];
+
+    //         for (var k = 0; k < meta_data.length; k++) {
+    //           if (meta_data[k].key == "_preferred_delivery_date") {
+    //             delivery_date = meta_data[k].value;
+    //           }
+    //         }
+    //         var data = {
+    //           order_id: orderID,
+    //           receiver_name:
+    //             customer_details.first_name + " " + customer_details.last_name,
+    //           building_or_street: customer_details.address_2,
+    //           barangay: customer_details.address_1,
+    //           city_or_municipality: customer_details.city,
+    //           province: customer_details.postcode,
+    //           contact_number: customer_details.phone,
+    //           email: customer_details.email,
+    //           total_payment: ORDER.total,
+    //           preferred_delivery_date: delivery_date,
+    //           order_status: this.orderStatus,
+    //           landmark: customer_details.company,
+    //           payment_method: ORDER.payment_method,
+    //           payment_status: ORDER.status
+    //         };
+
+    //       this.saveOrder(data);
+    //       this.saveOrderDetails(order_details, orderID);
+    //       }
+    //     });
+    // },
+    // saveOrderDetails(order_details, orderID) {
+    //   for (var j = 0; j < order_details.length; j++) {
+    //     let details = {
+    //       order_id: orderID,
+    //       product_name: order_details[j].name,
+    //       order_quantity: order_details[j].quantity
+    //     };
+
+    //     axios
+    //       .post(this.url + "/api/order-details", details, this.config)
+    //       .then(response => {
+    //         this.fetchOrders();
+    //       })
+    //       .catch(error => {
+    //         console.log("ERROR: ", error);
+    //       });
+    //   }
+    // },
+    // saveOrder(param) {
+    //   axios
+    //     .post(this.url + "/api/save-orders", param, this.config)
+    //     .then(response => {
+    //       this.fetchOrders();
+    //     })
+    //     .catch(error => {
+    //       console.log("ERROR: ", error);
+    //     });
+    // }
+
+    //-----------------------JUST TRY----------------------------------------->>
+
     saveOrders() {
       axios
         .get(
           "https://wawens.tamarindph.com/wp-json/wc/v2/orders?consumer_key=ck_d6fbb57e19291fe40e1acea63eea4139e457539b&consumer_secret=cs_a2b591bddfb2c5ce4fdacb21d0cdac17e2a7e7b9"
         )
         .then(response => {
-          for (var i = 0; i < response.data.length; i++) {
-            var customer_details = response.data[i].billing;
-            var delivery_date = "";
-            var orderID = response.data[i].id;
-            var meta_data = response.data[i].meta_data;
-            var order_details = response.data[i].line_items;
-            var ORDER = response.data[i];
-
-            for (var k = 0; k < meta_data.length; k++) {
-              if (meta_data[k].key == "_preferred_delivery_date") {
-                delivery_date = meta_data[k].value;
-              }
-            }
-            var data = {
-              order_id: orderID,
-              receiver_name:
-                customer_details.first_name + " " + customer_details.last_name,
-              building_or_street: customer_details.address_2,
-              barangay: customer_details.address_1,
-              city_or_municipality: customer_details.city,
-              province: customer_details.postcode,
-              contact_number: customer_details.phone,
-              email: customer_details.email,
-              total_payment: ORDER.total,
-              preferred_delivery_date: delivery_date,
-              order_status: this.orderStatus,
-              landmark: customer_details.company,
-              payment_method: ORDER.payment_method,
-              payment_status: ORDER.status
-            };
-
-          this.saveOrder(data);
-          this.saveOrderDetails(order_details, orderID);
-          }
+          let param = response.data;
+          axios
+            .post(this.url + "/api/save-orders", param, this.config)
+            .then(response => {
+              console.log("-----", response.data)
+              this.fetchOrders();
+            })
+            .catch(error => {
+              console.log("ERROR: ", error);
+            });
         });
     },
-    saveOrderDetails(order_details, orderID) {
-      for (var j = 0; j < order_details.length; j++) {
-        let details = {
-          order_id: orderID,
-          product_name: order_details[j].name,
-          order_quantity: order_details[j].quantity
-        };
-
-        axios
-          .post(this.url + "/api/order-details", details, this.config)
-          .then(response => {
-            this.fetchOrders();
-          })
-          .catch(error => {
-            console.log("ERROR: ", error);
-          });
-      }
-    },
-    saveOrder(param) {
-      axios
-        .post(this.url + "/api/save-orders", param, this.config)
-        .then(response => {
-          this.fetchOrders();
-        })
-        .catch(error => {
-          console.log("ERROR: ", error);
-        });
-    }
   }
 };
 </script>

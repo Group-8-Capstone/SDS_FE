@@ -195,7 +195,7 @@ const router = new VueRouter({
 
 router.beforeEach(async(to, from, next) => {
   const home = {
-    admin: '/delivery',
+    admin: '/order',
     driver: '/delivery',
     // customer: '/customerHome'
   }
